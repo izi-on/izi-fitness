@@ -46,7 +46,7 @@ export default function Home({navigation}) {
                   marginVertical: 8,
                   marginHorizontal: 16,
                   backgroundColor: selectedId==item.id?'blue':'white'
-                }} onPress={() => {setSelectedId(item.id); navigation.navigate('Exercise')}}> 
+                }} onPress={() => {setSelectedId(item.id); navigation.navigate('Exercise', {name: item.name})}}> 
                   <View >
                       <Text> {item.name} </Text>
                   </View>
