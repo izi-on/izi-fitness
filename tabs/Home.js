@@ -1,23 +1,45 @@
-import { View, Text, Button, TextInput, ScrollView, FlatList, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, Button, TextInput, FlatList, TouchableOpacity} from 'react-native'
 import React, { useEffect, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home({navigation}) {
 
     const [textS, setTextS] = useState('')
     const [exercises, setExercises] = useState([]) //currently for testing, this will be stored locally or on a server later
-    const [selectedId, setSelectedId] = useState(1)
 
     const handleCreate = () => {
         if (textS === '') {return;}
-        setExercises((prevExercises) => {
-            return [...prevExercises, {name:textS, id: Math.floor(Math.random() * 10000000).toString()}]
-        })
+        const exercise = {name:textS, id: Math.floor(Math.random() * 10000000).toString()}
+        _addExercise(exercise)
+        _getExercises()
         setTextS('')
     }
 
     useEffect(() => {
-        console.log('The exercises are: ', exercises)
-    }, [exercises])
+      _getExercises()
+    }, [])
+
+    const _addExercise = async (exercise) => {
+      try {
+        const jsonValue = JSON.stringify({data: [...exercises, exercise]})
+        await AsyncStorage.setItem('exercises',jsonValue)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    const _getExercises = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('exercises')
+        const res = (jsonValue !== null) ? JSON.parse(jsonValue) : null
+        setExercises(res.data)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+
+
 
   return (
     
@@ -45,16 +67,17 @@ export default function Home({navigation}) {
                   padding: 20,
                   marginVertical: 8,
                   marginHorizontal: 16,
-                  backgroundColor: selectedId==item.id?'blue':'white'
-                }} onPress={() => {setSelectedId(item.id); navigation.navigate('Exercise', {name: item.name})}}> 
+                  backgroundColor: 'grey'
+                }} onPress={() => {navigation.navigate('Exercise', {name: item.name});}}> 
                   <View >
                       <Text> {item.name} </Text>
                   </View>
                 </TouchableOpacity>
               )}
               keyExtractor={item => item.id}
-              extraData={selectedId}
             />
     </View>
+    
+
   )
 }
