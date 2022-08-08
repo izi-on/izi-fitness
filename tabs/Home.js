@@ -1,7 +1,8 @@
-import { View, Text, Button, TextInput, FlatList, TouchableOpacity, Image} from 'react-native'
+import { View, Text, Button, TextInput, FlatList, TouchableOpacity, StyleSheet, Animated} from 'react-native'
 import Card from '../custom-components/Card'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Swipeable, RectButton } from 'react-native-gesture-handler';
 
 export default function Home({navigation}) {
 
@@ -10,7 +11,7 @@ export default function Home({navigation}) {
 
     const handleCreate = () => {
         if (textS === '') {return;}
-        const exercise = {name:textS, id: Math.floor(Math.random() * 10000000).toString()}
+        const exercise = {name:textS, id: Math.floor(Math.random() * 1000000000).toString()}
         _addExercise(exercise)
         _getExercises()
         setTextS('')
@@ -39,7 +40,42 @@ export default function Home({navigation}) {
       }
     }
 
+    //animation for right swipe
+    const renderRightActions = (progress, dragX) => {
+      const trans = dragX.interpolate({
+        inputRange: [0, 50, 100, 101],
+        outputRange: [-20, 0, 0, 1],
+      });
+      return (
+        <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+          <RectButton
+            style={[styles.rightAction, { 
+              backgroundColor: 'red',
+              borderRadius: 6,
+              elevation: 3,
+              shadowOffset: {width: 1, height: 1},
+              shadowColor: '#333',
+              shadowOpacity: 0.3,
+              shadowRadius: 2,
+              marginHorizontal: 4,
+              marginVertical: 6,
+          }]}
+            onPress={pressHandler}>
+            <Text style={styles.actionText}>Delete</Text>
+          </RectButton>
+        </Animated.View>
 
+      );
+    };
+
+    const pressHandler = () => {
+      return
+    }
+
+
+    const clearAsyncStorage = async() => {
+      AsyncStorage.clear();
+    }
 
 
   return (
@@ -64,18 +100,49 @@ export default function Home({navigation}) {
             <FlatList
               data={exercises}
               renderItem={({item}) => (
-                <TouchableOpacity 
-                  onPress={() => {navigation.navigate('Exercise', {name: item.name});}}
-                > 
-                  <Card>
-                      <Text> {item.name} </Text>
-                  </Card>
-                </TouchableOpacity>
+                
+                  <TouchableOpacity 
+                    onPress={() => {navigation.navigate('Exercise', {name: item.name});}}
+                  > 
+                    <Swipeable
+                      renderRightActions={renderRightActions}
+                    >
+                      <Card>
+                          <Text> {item.name} </Text>
+                      </Card>
+
+                    </Swipeable>
+
+                  </TouchableOpacity>
+
               )}
               keyExtractor={item => item.id}
             />
+        <Button
+          title='Delete all data'
+          onPress={clearAsyncStorage}
+        />
     </View>
     
 
   )
 }
+//for the animation swipe (mainly)
+const styles = StyleSheet.create({
+  leftAction: {
+    flex: 1,
+    backgroundColor: '#497AFC',
+    justifyContent: 'center',
+  },
+  actionText: {
+    color: 'white',
+    fontSize: 16,
+    backgroundColor: 'transparent',
+    padding: 10,
+  },
+  rightAction: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+});
