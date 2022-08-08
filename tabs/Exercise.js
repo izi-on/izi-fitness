@@ -1,95 +1,50 @@
 import { View, Text, FlatList, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Exercise({navigation, route}) {
 
-    const name = route.params.name
+    const name = route.params.name //NAME OF THE EXERCISE
+    console.log('THE NAME IS', name)
 
     //for testing purposes, this will be extracted later from local db
-    const [DATA, SETDATA] = useState([
-        {
-            id: '1',
-            date: "July 13",
-            sets: [
-                {
-                    reps: 12,
-                    weight: 120,
-                    id: '4'
-                },
-                {
-                    reps: 10,
-                    weight: 150,
-                    id: '5'
-
-                },
-                {
-                    reps: 8,
-                    weight: 160,
-                    id: '6'
-
-                }
-            ]
-        }, 
-        {
-            id: '2',
-            date: "July 14",
-            sets: [
-                {
-                    reps: 12,
-                    weight: 125,
-                    id: '7'
-
-                },
-                {
-                    reps: 10,
-                    weight: 155,
-                    id: '8'
-
-                },
-                {
-                    reps: 8,
-                    weight: 165,
-                    id: '9'
-
-                }
-            ]
-        },
-        {
-            id: '3',
-            date: "July 15",
-            sets: [
-                {
-                    reps: 12,
-                    weight: 130,
-                    id: '10'
-
-                },
-                {
-                    reps: 10,
-                    weight: 160,
-                    id: '11'
-
-                },
-                {
-                    reps: 8,
-                    weight: 170,
-                    id: '12'
-
-                }
-            ]
-        }
-        
-    ])
-
+    const [DATA, SETDATA] = useState([])
     
 
-    const handleAdd = () => {
-        navigation.navigate('Add set')
+    //GET DATA FUNCTION 
+    const _getData = async () => {
+        try {
+            jsonValue = await AsyncStorage.getItem(name)
+            res = (jsonValue !== null ? JSON.parse(jsonValue): null)
+            SETDATA(res.data) //CHECK IF NULL 
+        } catch (e) {
+            console.log(e)
+        }
     }
+    
+    //STORE DATA
+    const _storeData = async (newData) => {
+        try {
+            jsonValue = JSON.stringify({data: newData})
+            await AsyncStorage.setItem(name, jsonValue)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const handleAdd = () => {
+        navigation.navigate('Add set', {name: name})
+    }
+
+    useEffect(() => {
+        _getData()
+    }, [])
 
     useEffect(() => {
 
         const returnData = route.params.returnData
+
+        //ADD DATA? 
         if (returnData) {
             
             let toInsert = true //if its a new date
@@ -118,6 +73,10 @@ export default function Exercise({navigation, route}) {
                     })
                 }
                 
+                //store to local db
+                _storeData(newData)
+                
+
                 return newData
                 
             })

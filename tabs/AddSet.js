@@ -1,7 +1,8 @@
 import { View, Text, TextInput, Button } from 'react-native'
 import React, { useState } from 'react'
+import { TabRouter } from '@react-navigation/native'
 
-export default function AddSet({navigation}) {
+export default function AddSet({navigation, route}) {
 
     const [date, setDate] = useState(null)
     const [tReps, setTReps] = useState(null)
@@ -13,6 +14,7 @@ export default function AddSet({navigation}) {
             console.log('ADDING SET')
             navigation.navigate('Exercise',
                 {
+                    name: route.params.name,
                     returnData: {
 
                         id: Math.floor(Math.random() * 10000000).toString(),
