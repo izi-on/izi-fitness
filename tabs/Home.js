@@ -1,4 +1,5 @@
-import { View, Text, Button, TextInput, FlatList, TouchableOpacity} from 'react-native'
+import { View, Text, Button, TextInput, FlatList, TouchableOpacity, Image} from 'react-native'
+import Card from '../custom-components/Card'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -63,15 +64,12 @@ export default function Home({navigation}) {
             <FlatList
               data={exercises}
               renderItem={({item}) => (
-                <TouchableOpacity style={{
-                  padding: 20,
-                  marginVertical: 8,
-                  marginHorizontal: 16,
-                  backgroundColor: 'grey'
-                }} onPress={() => {navigation.navigate('Exercise', {name: item.name});}}> 
-                  <View >
+                <TouchableOpacity 
+                  onPress={() => {navigation.navigate('Exercise', {name: item.name});}}
+                > 
+                  <Card>
                       <Text> {item.name} </Text>
-                  </View>
+                  </Card>
                 </TouchableOpacity>
               )}
               keyExtractor={item => item.id}

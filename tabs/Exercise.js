@@ -1,6 +1,7 @@
 import { View, Text, FlatList, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Card from '../custom-components/Card'
 
 export default function Exercise({navigation, route}) {
 
@@ -97,20 +98,19 @@ export default function Exercise({navigation, route}) {
         renderItem={({item}) => {
 
             return (
-                <View>
-                <Text>---------------</Text>
-                <Text>---------------</Text>
-                <Text>---------------</Text>
-                <Text>{item.date}:</Text>
-                <Text>---------------</Text>
-                {item.sets.map((set) => (
-                    <View key={set.id}>
-                        <Text>Reps: {set.reps} </Text>
-                        <Text>Weight: {set.weight} </Text>
-                        <Text>---------------</Text>
+                <Card>
+                    <View>
+                    <Text>{item.date}:</Text>
+                    <Text>---------------</Text>
+                    {item.sets.map((set) => (
+                        <View key={set.id}>
+                            <Text>Reps: {set.reps} </Text>
+                            <Text>Weight: {set.weight} </Text>
+                            <Text>---------------</Text>
+                        </View>
+                    ))}
                     </View>
-                ))}
-                </View>
+                </Card>
             )
             
         }}
