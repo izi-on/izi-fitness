@@ -10,7 +10,7 @@ export default function Home({navigation}) {
     const handleCreate = () => {
         if (textS === '') {return;}
         setExercises((prevExercises) => {
-            return [...prevExercises, {name:textS, id: Math.floor(Math.random() * 10000000000000).toString()}]
+            return [...prevExercises, {name:textS, id: Math.floor(Math.random() * 10000000).toString()}]
         })
         setTextS('')
     }

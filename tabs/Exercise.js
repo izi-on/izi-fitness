@@ -1,12 +1,12 @@
-import { View, Text, FlatList } from 'react-native'
-import React from 'react'
+import { View, Text, FlatList, Button } from 'react-native'
+import React, { useEffect, useState } from 'react'
 
-export default function Exercise({route}) {
+export default function Exercise({navigation, route}) {
 
     const name = route.params.name
 
-    //for testing purposes, this will be extracted later
-    const DATA = [
+    //for testing purposes, this will be extracted later from local db
+    const [DATA, SETDATA] = useState([
         {
             id: '1',
             date: "July 13",
@@ -79,10 +79,59 @@ export default function Exercise({route}) {
             ]
         }
         
-    ]
+    ])
+
+    
+
+    const handleAdd = () => {
+        navigation.navigate('Add set')
+    }
+
+    useEffect(() => {
+
+        const returnData = route.params.returnData
+        if (returnData) {
+            
+            let toInsert = true //if its a new date
+
+            SETDATA((prevData) => {
+                
+                let newData = prevData.map((item) => {
+                    
+                    if (returnData.date.toLowerCase() === item.date.toLowerCase()) {
+                        toInsert = false
+                        item.sets.push({
+                            reps: returnData.reps,
+                            weight: returnData.weight,
+                            id: returnData.id
+                        })
+                    } 
+                    
+                    return item
+                })
+
+                if (toInsert) {
+                    newData.push({
+                        id: Math.floor(Math.random() * 10000000).toString(),
+                        date: returnData.date,
+                        sets: [{reps: returnData.reps, weight: returnData.weight, id: returnData.id}]
+                    })
+                }
+                
+                return newData
+                
+            })
+            
+        } 
+    }, [route.params.returnData])
 
   return (
     <View>
+      <Button 
+        title="Add set"
+        onPress={handleAdd}
+      />
+
       <Text>Exercise history for {name}:</Text>
       <FlatList
         data={DATA}
