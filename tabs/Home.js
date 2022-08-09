@@ -2,8 +2,9 @@ import { View, Text, Button, TextInput, FlatList, TouchableOpacity, StyleSheet, 
 import Card from '../custom-components/Card'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Swipeable, RectButton } from 'react-native-gesture-handler';
+import { Swipeable, RectButton, ScrollView } from 'react-native-gesture-handler';
 import uuid from 'react-native-uuid'
+import { Dimensions } from 'react-native';
 
 export default function Home({navigation}) {
 
@@ -24,14 +25,11 @@ export default function Home({navigation}) {
       try {
         var jsonValue;
         if (exercise) {
-          console.log('ADDING EXERCISE: ', exercise)
           jsonValue = JSON.stringify({data: [...exercises, exercise]})
         } else {
-          console.log('UPDATING EXERCISES: ', exercises)
           jsonValue = JSON.stringify({data: (exercises)?[...exercises]:null})
         }
         await AsyncStorage.setItem('exercises',jsonValue)
-        console.log('EXERCISES ADDED/UPDATED')
       } catch (e) {
         console.log(e)
       }
@@ -48,7 +46,7 @@ export default function Home({navigation}) {
     }
 
     //triggers useEffect to refresh data on current page
-    const pageRefresh = () => {console.log('REFRESHING...'); setRSwitch(pSwitch => {return !pSwitch})}
+    const pageRefresh = () => {setRSwitch(pSwitch => {return !pSwitch})}
 
     const removeExercise = async (itemId) => {
       //remove exercise sets
@@ -59,12 +57,10 @@ export default function Home({navigation}) {
       }
 
       //remove exercise
-      console.log('removing exercise: ', itemId)
       setExercises(prevExercises => {
         const newExercises = prevExercises.filter(exercise => {
           return exercise.id !== itemId
         })
-        console.log('new exercises are:', newExercises)
         
         return newExercises
       })
@@ -80,11 +76,9 @@ export default function Home({navigation}) {
 
     //refresh also runs on start
     useEffect(() => {
-      console.log('REFRESH TRIGGERED')
       _getExercises()
       AsyncStorage.getAllKeys((err, keys) => {
         if (err) {console.log(err)}
-        console.log('THE KEYS ARE:', keys)
       })
     }, [rSwitch])
 
@@ -98,27 +92,32 @@ export default function Home({navigation}) {
 
   return (
     
-    <View>
-        <Text>Exercise logs:</Text>
+    <View style={{alignItems:'stretch'}}>
+      <View style={{...styles.container, zIndex: 1, width: Dimensions.get ('window').width,
+      height: Dimensions.get ('window').height*0.15}}>
+        <Text style={{flex: 1}}>Exercise logs:</Text>
         <TextInput 
             style={{
                 height: 40,
                 margin: 12,
                 borderWidth: 1,
                 padding: 10,
+                flex: 1,
               }}
             placeHolder='Enter exercise name'
             onChangeText={setTextS}
             value={textS}
         />
         <Button
+            style={{flex: 1}}
             title='Add exercise'
             onPress={handleCreate}
         />  
+      </View>
+            <View style={{...styles.container, height: Dimensions.get ('window').height*0.648}}>
             <FlatList
               data={exercises}
               renderItem={({item}) => (
-                
                 <Swipeable
                   renderRightActions={(progress, dragX) => {
                     const trans = dragX.interpolate({
@@ -130,14 +129,11 @@ export default function Home({navigation}) {
                         <RectButton
                           style={[styles.rightAction, { 
                             backgroundColor: 'red',
-                            borderRadius: 6,
                             elevation: 3,
                             shadowOffset: {width: 1, height: 1},
                             shadowColor: '#333',
                             shadowOpacity: 0.3,
                             shadowRadius: 2,
-                            marginHorizontal: 4,
-                            marginVertical: 6,
                         }]}
                           onPress={() => removeExercise(item.id)}>
                           <Text style={styles.actionText}>Delete</Text>
@@ -158,7 +154,19 @@ export default function Home({navigation}) {
 
               )}
               keyExtractor={item => item.id}
+              ItemSeparatorComponent={()=>(
+                <View
+                style={{alignItems:'center'}}
+                >
+                <View style={{
+                  height: 1,
+                  width: "60%",
+                  backgroundColor: "#607D8B",
+                }}></View>
+                </View>
+              )}
             />
+            </View>
         <Button
           title='Delete all data'
           onPress={clearAsyncStorage}
@@ -170,11 +178,14 @@ export default function Home({navigation}) {
 }
 //for the animation swipe (mainly)
 const styles = StyleSheet.create({
-  leftAction: {
-    flex: 1,
-    backgroundColor: '#497AFC',
-    justifyContent: 'center',
+  container: {
+    backgroundColor: "#E6E6E6",
+    borderWidth: 0,
+    borderColor: "#000000",
+    overflow: "visible",
   },
+
+
   actionText: {
     color: 'white',
     fontSize: 16,
