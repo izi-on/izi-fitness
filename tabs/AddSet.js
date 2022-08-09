@@ -1,6 +1,7 @@
 import { View, Text, TextInput, Button } from 'react-native'
 import React, { useState } from 'react'
 import { TabRouter } from '@react-navigation/native'
+import uuid from 'react-native-uuid'
 
 export default function AddSet({navigation, route}) {
 
@@ -17,7 +18,7 @@ export default function AddSet({navigation, route}) {
                     name: route.params.name,
                     returnData: {
 
-                        id: Math.floor(Math.random() * 10000000).toString(),
+                        id: uuid.v4(),
                         date: date,
                         reps: tReps,
                         weight: tWeight

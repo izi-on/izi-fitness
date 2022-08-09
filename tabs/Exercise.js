@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import Card from '../custom-components/Card'
 import { RectButton } from 'react-native-gesture-handler'
 import { Swipeable } from 'react-native-gesture-handler'
+import uuid from 'react-native-uuid'
 
 export default function Exercise({navigation, route}) {
 
@@ -53,7 +54,7 @@ export default function Exercise({navigation, route}) {
           const newSets = item.sets.filter(set => {
             return (set.id !== setId)
           })
-          console.log('NEW SETS AFTER FILTER: ', newSets)
+          console.log('NEW SETS AFTER FILTER:', newSets)
           return (newSets.length === 0) ? null : {...item, sets: newSets}
 
         })
@@ -87,7 +88,6 @@ export default function Exercise({navigation, route}) {
             
             console.log('NEW SET DETECTED, ADDING SET')
 
-
             SETDATA((prevData) => {
               
               console.log('THE PREVIOUS DATA WAS: ', prevData)
@@ -97,7 +97,7 @@ export default function Exercise({navigation, route}) {
               if (!prevData) {
 
                 newData = [{
-                  id: Math.floor(Math.random() * 1000000000).toString(),
+                  id: uuid.v4(),
                   date: returnData.date,
                   sets: [{reps: returnData.reps, weight: returnData.weight, id: returnData.id}]
                 }]
@@ -123,7 +123,7 @@ export default function Exercise({navigation, route}) {
 
                 if (toInsert) {
                     newData.push({
-                        id: Math.floor(Math.random() * 1000000000).toString(),
+                        id: uuid.v4(),
                         date: returnData.date,
                         sets: [{reps: returnData.reps, weight: returnData.weight, id: returnData.id}]
                     })

@@ -3,6 +3,7 @@ import Card from '../custom-components/Card'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
+import uuid from 'react-native-uuid'
 
 export default function Home({navigation}) {
 
@@ -11,7 +12,7 @@ export default function Home({navigation}) {
 
     const handleCreate = () => {
         if (textS === '') {return;}
-        const exercise = {name:textS, id: Math.floor(Math.random() * 1000000000).toString()}
+        const exercise = {name:textS, id: uuid.v4()}
         _addExercise(exercise)
         _getExercises()
         setTextS('')
@@ -101,19 +102,17 @@ export default function Home({navigation}) {
               data={exercises}
               renderItem={({item}) => (
                 
+                <Swipeable
+                  renderRightActions={renderRightActions}
+                >
                   <TouchableOpacity 
                     onPress={() => {navigation.navigate('Exercise', {name: item.name});}}
                   > 
-                    <Swipeable
-                      renderRightActions={renderRightActions}
-                    >
-                      <Card>
-                          <Text> {item.name} </Text>
-                      </Card>
-
-                    </Swipeable>
-
+                    <Card>
+                        <Text> {item.name} </Text>
+                    </Card>
                   </TouchableOpacity>
+                </Swipeable>
 
               )}
               keyExtractor={item => item.id}
