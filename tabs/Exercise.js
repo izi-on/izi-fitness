@@ -12,12 +12,11 @@ export default function Exercise({navigation, route}) {
 
     //for testing purposes, this will be extracted later from local db
     const [DATA, SETDATA] = useState([])
-    
 
     //GET DATA FUNCTION 
     const _getData = async () => {
         try {
-            jsonValue = await AsyncStorage.getItem(name)
+            jsonValue = await AsyncStorage.getItem('exercise-'+name)
             res = (jsonValue !== null ? JSON.parse(jsonValue): null)
             SETDATA(res.data) //CHECK IF NULL 
         } catch (e) {
@@ -29,7 +28,7 @@ export default function Exercise({navigation, route}) {
     const _storeData = async (newData) => {
         try {
             jsonValue = JSON.stringify({data: newData})
-            await AsyncStorage.setItem(name, jsonValue)
+            await AsyncStorage.setItem('exercise-'+name, jsonValue)
         } catch (e) {
             console.log(e)
         }
@@ -40,67 +39,86 @@ export default function Exercise({navigation, route}) {
         navigation.navigate('Add set', {name: name})
     }
 
-    //animation for right swipe
-    const renderRightActions = (progress, dragX) => {
-        const trans = dragX.interpolate({
-          inputRange: [0, 50, 100, 101],
-          outputRange: [-20, 0, 0, 1],
-        });
-        return (
-          <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
-            <RectButton
-              style={[styles.rightAction, { 
-                backgroundColor: 'red',
-                borderRadius: 6,
-                elevation: 3,
-                shadowOffset: {width: 1, height: 1},
-                shadowColor: '#333',
-                shadowOpacity: 0.3,
-                shadowRadius: 2,
-                marginHorizontal: 4,
-                marginVertical: 6,
-            }]}
-              onPress={pressHandler}>
-              <Text style={styles.actionText}>Delete</Text>
-            </RectButton>
-          </Animated.View>
+    //REMOVE DATA
+    const removeData = (itemId, setId) => {
 
-        );
-      };
+      console.log(`REMOVING ITEM: ${itemId} AND SET: ${setId}`)
 
-    const pressHandler = () => {
-        return
+      SETDATA((prevData) => {
+
+        let newData = prevData.map(item => {
+          
+          if (itemId !== item.id) {return item}
+
+          const newSets = item.sets.filter(set => {
+            return (set.id !== setId)
+          })
+          console.log('NEW SETS AFTER FILTER: ', newSets)
+          return (newSets.length === 0) ? null : {...item, sets: newSets}
+
+        })
+        newData = newData.filter(data => {return data!==null})
+        console.log('OBJECT AFTER FILTER:', newData)
+        if (newData.length === 0) {
+          _storeData(null)
+          return null
+        } else {
+          _storeData(newData)
+          return newData
+          
+        }
+        
+      })  
     }
 
     //ON INITIAL LOAD, GET DATA
     useEffect(() => {
+        console.log('INIT LOAD DETECTED, GET DATA')
         _getData()
     }, [])
 
     //ADD DATA
     useEffect(() => {
-
+        
         const returnData = route.params.returnData
 
         //ADD DATA? 
         if (returnData) {
             
-            let toInsert = true //if its a new date
+            console.log('NEW SET DETECTED, ADDING SET')
+
 
             SETDATA((prevData) => {
-                
-                let newData = prevData.map((item) => {
-                    
-                    if (returnData.date.toLowerCase() === item.date.toLowerCase()) {
-                        toInsert = false
-                        item.sets.push({
-                            reps: returnData.reps,
-                            weight: returnData.weight,
-                            id: returnData.id
-                        })
-                    } 
-                    
-                    return item
+              
+              console.log('THE PREVIOUS DATA WAS: ', prevData)
+
+              var newData;
+
+              if (!prevData) {
+
+                newData = [{
+                  id: Math.floor(Math.random() * 1000000000).toString(),
+                  date: returnData.date,
+                  sets: [{reps: returnData.reps, weight: returnData.weight, id: returnData.id}]
+                }]
+
+              } else {
+
+                let toInsert = true //if its a new date
+
+                newData = prevData.map((item) => {
+                  
+                  if (returnData.date.toLowerCase() === item.date.toLowerCase()) {
+                      toInsert = false
+                      item.sets.push({
+                          reps: returnData.reps,
+                          weight: returnData.weight,
+                          id: returnData.id
+                      })
+                  } 
+                  
+                  return item
+
                 })
 
                 if (toInsert) {
@@ -110,12 +128,15 @@ export default function Exercise({navigation, route}) {
                         sets: [{reps: returnData.reps, weight: returnData.weight, id: returnData.id}]
                     })
                 }
-                
-                //store to local db
-                _storeData(newData)
-                
 
-                return newData
+              }
+
+              console.log('THE NEW DATA IS: ', newData)
+
+              //store to local db
+              _storeData(newData)
+
+              return newData
                 
             })
             
@@ -136,13 +157,38 @@ export default function Exercise({navigation, route}) {
 
             return (
                 <View>
+                {console.log('RENDERING ITEM: ', item.id)}
                 <Text>{item.date}:</Text>
                         <View>
                                 {item.sets.map((set) => (
-                                    
                                     <View  key={set.id}>
+                                        {console.log('RENDERING SET: ', set.id)}
                                         <Swipeable
-                                        renderRightActions={renderRightActions}
+                                          renderRightActions={(progress, dragX) => {
+                                            const trans = dragX.interpolate({
+                                              inputRange: [0, 50, 100, 101],
+                                              outputRange: [-20, 0, 0, 1],
+                                            });
+                                            return (
+                                              <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+                                                <RectButton
+                                                  style={[styles.rightAction, { 
+                                                    backgroundColor: 'red',
+                                                    borderRadius: 6,
+                                                    elevation: 3,
+                                                    shadowOffset: {width: 1, height: 1},
+                                                    shadowColor: '#333',
+                                                    shadowOpacity: 0.3,
+                                                    shadowRadius: 2,
+                                                    marginHorizontal: 4,
+                                                    marginVertical: 6,
+                                                }]}
+                                                  onPress={() => removeData(item.id, set.id)}>
+                                                  <Text style={styles.actionText}>Delete</Text>
+                                                </RectButton>
+                                              </Animated.View>
+                                            );
+                                          }}
                                         >
                                             <Card>
 
@@ -154,7 +200,7 @@ export default function Exercise({navigation, route}) {
                                             </Card>
                                         </Swipeable>
                                     </View>
-                                ))}
+                                ) )}
                         </View>
                 </View>
             )
