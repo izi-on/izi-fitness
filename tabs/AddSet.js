@@ -16,6 +16,7 @@ export default function AddSet({navigation, route}) {
             navigation.navigate('Exercise',
                 {
                     name: route.params.name,
+                    id: route.params.id,
                     returnData: {
 
                         id: uuid.v4(),

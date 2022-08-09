@@ -8,7 +8,9 @@ import uuid from 'react-native-uuid'
 
 export default function Exercise({navigation, route}) {
 
-    const name = route.params.name //NAME OF THE EXERCISE
+    const name = route.params.name 
+    const exId = route.params.id
+
     console.log('THE NAME IS', name)
 
     //for testing purposes, this will be extracted later from local db
@@ -17,7 +19,7 @@ export default function Exercise({navigation, route}) {
     //GET DATA FUNCTION 
     const _getData = async () => {
         try {
-            jsonValue = await AsyncStorage.getItem('exercise-'+name)
+            jsonValue = await AsyncStorage.getItem('exercise-'+exId)
             res = (jsonValue !== null ? JSON.parse(jsonValue): null)
             SETDATA(res.data) //CHECK IF NULL 
         } catch (e) {
@@ -29,7 +31,7 @@ export default function Exercise({navigation, route}) {
     const _storeData = async (newData) => {
         try {
             jsonValue = JSON.stringify({data: newData})
-            await AsyncStorage.setItem('exercise-'+name, jsonValue)
+            await AsyncStorage.setItem('exercise-'+exId, jsonValue)
         } catch (e) {
             console.log(e)
         }
@@ -37,13 +39,13 @@ export default function Exercise({navigation, route}) {
 
     //HANDLE ADDING DATA, LOGIC IS IN USE EFFECT
     const handleAdd = () => {
-        navigation.navigate('Add set', {name: name})
+        navigation.navigate('Add set', {name: name, id: exId})
     }
 
     //REMOVE DATA
     const removeData = (itemId, setId) => {
 
-      console.log(`REMOVING ITEM: ${itemId} AND SET: ${setId}`)
+      console.log(`REMOVING FROM ITEM: ${itemId}, SET: ${setId}`)
 
       SETDATA((prevData) => {
 

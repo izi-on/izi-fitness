@@ -9,23 +9,29 @@ export default function Home({navigation}) {
 
     const [textS, setTextS] = useState('')
     const [exercises, setExercises] = useState([]) //currently for testing, this will be stored locally or on a server later
+    const [rSwitch, setRSwitch] = useState(false)
+    const [removed, setRemoved] = useState(false)
 
     const handleCreate = () => {
         if (textS === '') {return;}
         const exercise = {name:textS, id: uuid.v4()}
         _addExercise(exercise)
-        _getExercises()
+        pageRefresh()
         setTextS('')
     }
 
-    useEffect(() => {
-      _getExercises()
-    }, [])
-
     const _addExercise = async (exercise) => {
       try {
-        const jsonValue = JSON.stringify({data: [...exercises, exercise]})
+        var jsonValue;
+        if (exercise) {
+          console.log('ADDING EXERCISE: ', exercise)
+          jsonValue = JSON.stringify({data: [...exercises, exercise]})
+        } else {
+          console.log('UPDATING EXERCISES: ', exercises)
+          jsonValue = JSON.stringify({data: (exercises)?[...exercises]:null})
+        }
         await AsyncStorage.setItem('exercises',jsonValue)
+        console.log('EXERCISES ADDED/UPDATED')
       } catch (e) {
         console.log(e)
       }
@@ -41,43 +47,54 @@ export default function Home({navigation}) {
       }
     }
 
-    //animation for right swipe
-    const renderRightActions = (progress, dragX) => {
-      const trans = dragX.interpolate({
-        inputRange: [0, 50, 100, 101],
-        outputRange: [-20, 0, 0, 1],
-      });
-      return (
-        <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
-          <RectButton
-            style={[styles.rightAction, { 
-              backgroundColor: 'red',
-              borderRadius: 6,
-              elevation: 3,
-              shadowOffset: {width: 1, height: 1},
-              shadowColor: '#333',
-              shadowOpacity: 0.3,
-              shadowRadius: 2,
-              marginHorizontal: 4,
-              marginVertical: 6,
-          }]}
-            onPress={pressHandler}>
-            <Text style={styles.actionText}>Delete</Text>
-          </RectButton>
-        </Animated.View>
+    //triggers useEffect to refresh data on current page
+    const pageRefresh = () => {console.log('REFRESHING...'); setRSwitch(pSwitch => {return !pSwitch})}
 
-      );
-    };
+    const removeExercise = async (itemId) => {
+      //remove exercise sets
+      try {
+        await AsyncStorage.removeItem('exercise-'+itemId)
+      } catch (e) {
+        console.log(e)
+      }
 
-    const pressHandler = () => {
-      return
+      //remove exercise
+      console.log('removing exercise: ', itemId)
+      setExercises(prevExercises => {
+        const newExercises = prevExercises.filter(exercise => {
+          return exercise.id !== itemId
+        })
+        console.log('new exercises are:', newExercises)
+        
+        return newExercises
+      })
+
+      setRemoved(true)
+
+
     }
-
 
     const clearAsyncStorage = async() => {
       AsyncStorage.clear();
     }
 
+    //refresh also runs on start
+    useEffect(() => {
+      console.log('REFRESH TRIGGERED')
+      _getExercises()
+      AsyncStorage.getAllKeys((err, keys) => {
+        if (err) {console.log(err)}
+        console.log('THE KEYS ARE:', keys)
+      })
+    }, [rSwitch])
+
+    useEffect(() => {
+      if (removed) {
+        setRemoved(false)
+        _addExercise() //refresh db
+        pageRefresh()
+      }
+    }, [removed])
 
   return (
     
@@ -103,10 +120,35 @@ export default function Home({navigation}) {
               renderItem={({item}) => (
                 
                 <Swipeable
-                  renderRightActions={renderRightActions}
+                  renderRightActions={(progress, dragX) => {
+                    const trans = dragX.interpolate({
+                      inputRange: [0, 50, 100, 101],
+                      outputRange: [-20, 0, 0, 1],
+                    });
+                    return (
+                      <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+                        <RectButton
+                          style={[styles.rightAction, { 
+                            backgroundColor: 'red',
+                            borderRadius: 6,
+                            elevation: 3,
+                            shadowOffset: {width: 1, height: 1},
+                            shadowColor: '#333',
+                            shadowOpacity: 0.3,
+                            shadowRadius: 2,
+                            marginHorizontal: 4,
+                            marginVertical: 6,
+                        }]}
+                          onPress={() => removeExercise(item.id)}>
+                          <Text style={styles.actionText}>Delete</Text>
+                        </RectButton>
+                      </Animated.View>
+
+                    );
+                  }}
                 >
                   <TouchableOpacity 
-                    onPress={() => {navigation.navigate('Exercise', {name: item.name});}}
+                    onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
                   > 
                     <Card>
                         <Text> {item.name} </Text>
