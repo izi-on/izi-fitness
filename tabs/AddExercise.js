@@ -9,8 +9,6 @@ export default function AddExercise({navigation, route}) {
 
     const handleSubmit = () => {
         if (name) {
-            console.log(route.params.exercises)
-            console.log(route.params.exercises.filter(exercise => {return exercise.name === name}).length > 0)
             if (!route.params.exercises.filter(exercise => {return exercise.name.toLowerCase() === name.toLowerCase()}).length > 0) {
                 navigation.navigate('Home', {exercise: name})
                 setName(null)

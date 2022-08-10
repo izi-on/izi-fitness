@@ -12,6 +12,8 @@ export default function Home({navigation, route}) {
     const [exercises, setExercises] = useState([]) //currently for testing, this will be stored locally or on a server later
     const [rSwitch, setRSwitch] = useState(false)
     const [removed, setRemoved] = useState(false)
+    //const [filtered, setFiltered] = useState([])
+
     var newExer;
     function setVar () {
       try {
@@ -78,9 +80,6 @@ export default function Home({navigation, route}) {
     //refresh also runs on start
     useEffect(() => {
       _getExercises()
-      AsyncStorage.getAllKeys((err, keys) => {
-        if (err) {console.log(err)}
-      })
     }, [rSwitch])
 
     useEffect(() => {
@@ -99,6 +98,18 @@ export default function Home({navigation, route}) {
         setTextS('')
       }
     }, [newExer])
+
+    /*
+    useEffect(() => {
+      if (textS.trim() !== '') {
+        setFiltered(exercises.filter(exercise => {
+          return exercise.name.includes(textS)
+        }))
+      } else {
+        setFiltered(exercises)
+      }
+    }, [textS, exercises])
+    */
 
   return (
     
@@ -128,42 +139,50 @@ export default function Home({navigation, route}) {
       }}>
         <FlatList
           data={exercises}
-          renderItem={({item}) => (
-            <Swipeable
-              renderRightActions={(progress, dragX) => {
-                const trans = dragX.interpolate({
-                  inputRange: [0, 50, 100, 101],
-                  outputRange: [-20, 0, 0, 1],
-                });
+          renderItem={({item}) => 
+            {
+              if (item.name.includes(textS)) {
                 return (
-                  <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
-                    <RectButton
-                      style={[styles.rightAction, { 
-                        backgroundColor: 'red',
-                        elevation: 3,
-                        shadowOffset: {width: 1, height: 1},
-                        shadowColor: '#333',
-                        shadowOpacity: 0.3,
-                        shadowRadius: 2,
-                    }]}
-                      onPress={() => removeExercise(item.id)}>
-                      <Text style={styles.actionText}>Delete</Text>
-                    </RectButton>
-                  </Animated.View>
+                  <Swipeable
+                    renderRightActions={(progress, dragX) => {
+                      const trans = dragX.interpolate({
+                        inputRange: [0, 50, 100, 101],
+                        outputRange: [-20, 0, 0, 1],
+                      });
+                      return (
+                        <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+                          <RectButton
+                            style={[styles.rightAction, { 
+                              backgroundColor: 'red',
+                              elevation: 3,
+                              shadowOffset: {width: 1, height: 1},
+                              shadowColor: '#333',
+                              shadowOpacity: 0.3,
+                              shadowRadius: 2,
+                          }]}
+                            onPress={() => removeExercise(item.id)}>
+                            <Text style={styles.actionText}>Delete</Text>
+                          </RectButton>
+                        </Animated.View>
+      
+                      );
+                    }}
+                  >
+                    <TouchableOpacity 
+                      onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
+                    > 
+                      <Card>
+                          <Text> {item.name} </Text>
+                      </Card>
+                    </TouchableOpacity>
+                  </Swipeable>
+                )
+              } else {
+                return 
+              }
+            }
 
-                );
-              }}
-            >
-              <TouchableOpacity 
-                onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
-              > 
-                <Card>
-                    <Text> {item.name} </Text>
-                </Card>
-              </TouchableOpacity>
-            </Swipeable>
-
-          )}
+          }
           keyExtractor={item => item.id}
           ItemSeparatorComponent={()=>(
             <View
