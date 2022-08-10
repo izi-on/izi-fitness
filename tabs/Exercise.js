@@ -176,14 +176,7 @@ export default function Exercise({navigation, route}) {
                                                 <RectButton
                                                   style={[styles.rightAction, { 
                                                     backgroundColor: 'red',
-                                                    borderRadius: 6,
                                                     elevation: 3,
-                                                    shadowOffset: {width: 1, height: 1},
-                                                    shadowColor: '#333',
-                                                    shadowOpacity: 0.3,
-                                                    shadowRadius: 2,
-                                                    marginHorizontal: 4,
-                                                    marginVertical: 6,
                                                 }]}
                                                   onPress={() => removeData(item.id, set.id)}>
                                                   <Text style={styles.actionText}>Delete</Text>

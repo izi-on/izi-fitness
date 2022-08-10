@@ -6,12 +6,21 @@ import { Swipeable, RectButton, ScrollView } from 'react-native-gesture-handler'
 import uuid from 'react-native-uuid'
 import { Dimensions } from 'react-native';
 
-export default function Home({navigation}) {
+export default function Home({navigation, route}) {
 
     const [textS, setTextS] = useState('')
     const [exercises, setExercises] = useState([]) //currently for testing, this will be stored locally or on a server later
     const [rSwitch, setRSwitch] = useState(false)
     const [removed, setRemoved] = useState(false)
+    var newExer;
+    function setVar () {
+      try {
+        newExer = route.params.exercise
+      } catch (e) {
+        newExer = null
+      }
+    }
+    setVar()
 
     const handleCreate = () => {
         if (textS === '') {return;}
@@ -90,12 +99,20 @@ export default function Home({navigation}) {
       }
     }, [removed])
 
+    useEffect(() => {
+      if (newExer) {
+        const exercise = {name: newExer, id: uuid.v4()}
+        _addExercise(exercise)
+        pageRefresh()
+        setTextS('')
+      }
+    }, [newExer])
+
   return (
     
     <View style={{alignItems:'center'}}>
       <View style={{...styles.container, zIndex: 1, width: Dimensions.get ('window').width,
       height: Dimensions.get ('window').height*0.15, backgroundColor: 'white'}}>
-        <Text style={{flex: 1}}>Exercise logs:</Text>
         <TextInput 
             style={{
                 height: 40,
@@ -170,7 +187,7 @@ export default function Home({navigation}) {
         />
       </View>
         <TouchableOpacity
-          onPress={handleCreate}
+          onPress={() => navigation.navigate('Add exercise') /*handleCreate*/}
         >
           <View style={styles.button}>
             <View style={{alignItems:'center'}}>
