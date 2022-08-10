@@ -22,14 +22,6 @@ export default function Home({navigation, route}) {
     }
     setVar()
 
-    const handleCreate = () => {
-        if (textS === '') {return;}
-        const exercise = {name:textS, id: uuid.v4()}
-        _addExercise(exercise)
-        pageRefresh()
-        setTextS('')
-    }
-
     const _addExercise = async (exercise) => {
       try {
         var jsonValue;
@@ -187,7 +179,7 @@ export default function Home({navigation, route}) {
         />
       </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Add exercise') /*handleCreate*/}
+          onPress={() => navigation.navigate('Add exercise', {exercises: exercises}) /*handleCreate*/}
         >
           <View style={styles.button}>
             <View style={{alignItems:'center'}}>
