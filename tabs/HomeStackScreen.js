@@ -11,13 +11,11 @@ export default function HomeStackScreen() {
   return (
     <Stack.Navigator
         screenOptions={{
-            cardStyle: {
-                backgroundColor: 'white',
-            }
+            cardStyle: {backgroundColor: 'white',}
         }}
     >
         <Stack.Screen name="Home" component={Home} options={{ unmountOnBlur: true, headerShown: false }}/>
-        <Stack.Screen name="Exercise" component={Exercise} options={{ unmountOnBlur: true, headerShown: true }}/>
+        <Stack.Screen name="Exercise" component={Exercise} options={{ unmountOnBlur: true, headerShown: true}}/>
         <Stack.Screen name="Add set" component={AddSet} options={{ unmountOnBlur: true, headerShown: false }}/>
     </Stack.Navigator>
   )

@@ -1,4 +1,4 @@
-import { View, Text, Button, TextInput, FlatList, TouchableOpacity, StyleSheet, Animated} from 'react-native'
+import { View, Text, Button, TextInput, FlatList, TouchableOpacity, StyleSheet, Animated, Image} from 'react-native'
 import Card from '../custom-components/Card'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -92,9 +92,9 @@ export default function Home({navigation}) {
 
   return (
     
-    <View style={{alignItems:'stretch'}}>
+    <View style={{alignItems:'center'}}>
       <View style={{...styles.container, zIndex: 1, width: Dimensions.get ('window').width,
-      height: Dimensions.get ('window').height*0.15}}>
+      height: Dimensions.get ('window').height*0.15, backgroundColor: 'white'}}>
         <Text style={{flex: 1}}>Exercise logs:</Text>
         <TextInput 
             style={{
@@ -110,67 +110,80 @@ export default function Home({navigation}) {
         />
         <Button
             style={{flex: 1}}
-            title='Add exercise'
-            onPress={handleCreate}
+            title='Clear all data'
+            onPress={clearAsyncStorage}
         />  
       </View>
-            <View style={{...styles.container, height: Dimensions.get ('window').height*0.648}}>
-            <FlatList
-              data={exercises}
-              renderItem={({item}) => (
-                <Swipeable
-                  renderRightActions={(progress, dragX) => {
-                    const trans = dragX.interpolate({
-                      inputRange: [0, 50, 100, 101],
-                      outputRange: [-20, 0, 0, 1],
-                    });
-                    return (
-                      <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
-                        <RectButton
-                          style={[styles.rightAction, { 
-                            backgroundColor: 'red',
-                            elevation: 3,
-                            shadowOffset: {width: 1, height: 1},
-                            shadowColor: '#333',
-                            shadowOpacity: 0.3,
-                            shadowRadius: 2,
-                        }]}
-                          onPress={() => removeExercise(item.id)}>
-                          <Text style={styles.actionText}>Delete</Text>
-                        </RectButton>
-                      </Animated.View>
+      <View style={{...styles.container, width: Dimensions.get('window').width*0.85, 
+        height: Dimensions.get('window').height*0.55, backgroundColor: 'white', marginTop: 10,
+      }}>
+        <FlatList
+          data={exercises}
+          renderItem={({item}) => (
+            <Swipeable
+              renderRightActions={(progress, dragX) => {
+                const trans = dragX.interpolate({
+                  inputRange: [0, 50, 100, 101],
+                  outputRange: [-20, 0, 0, 1],
+                });
+                return (
+                  <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+                    <RectButton
+                      style={[styles.rightAction, { 
+                        backgroundColor: 'red',
+                        elevation: 3,
+                        shadowOffset: {width: 1, height: 1},
+                        shadowColor: '#333',
+                        shadowOpacity: 0.3,
+                        shadowRadius: 2,
+                    }]}
+                      onPress={() => removeExercise(item.id)}>
+                      <Text style={styles.actionText}>Delete</Text>
+                    </RectButton>
+                  </Animated.View>
 
-                    );
-                  }}
-                >
-                  <TouchableOpacity 
-                    onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
-                  > 
-                    <Card>
-                        <Text> {item.name} </Text>
-                    </Card>
-                  </TouchableOpacity>
-                </Swipeable>
+                );
+              }}
+            >
+              <TouchableOpacity 
+                onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
+              > 
+                <Card>
+                    <Text> {item.name} </Text>
+                </Card>
+              </TouchableOpacity>
+            </Swipeable>
 
-              )}
-              keyExtractor={item => item.id}
-              ItemSeparatorComponent={()=>(
-                <View
-                style={{alignItems:'center'}}
-                >
-                <View style={{
-                  height: 1,
-                  width: "60%",
-                  backgroundColor: "#607D8B",
-                }}></View>
-                </View>
-              )}
-            />
+          )}
+          keyExtractor={item => item.id}
+          ItemSeparatorComponent={()=>(
+            <View
+            style={{alignItems:'center'}}
+            >
+            <View style={{
+              height: 1,
+              width: "60%",
+              backgroundColor: "#607D8B",
+            }}></View>
             </View>
-        <Button
-          title='Delete all data'
-          onPress={clearAsyncStorage}
+          )}
         />
+      </View>
+        <TouchableOpacity
+          onPress={handleCreate}
+        >
+          <View style={styles.button}>
+            <View style={{alignItems:'center'}}>
+              <Image
+                style={styles.plusIcon}
+                source={require('../projectAssets/plus.png')}
+                
+              />
+            </View>
+          </View>
+
+        </TouchableOpacity>
+
     </View>
     
 
@@ -179,10 +192,24 @@ export default function Home({navigation}) {
 //for the animation swipe (mainly)
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#E6E6E6",
     borderWidth: 0,
-    borderColor: "#000000",
     overflow: "visible",
+  },
+
+  button: {
+    width: Dimensions.get('window').width*0.2,
+    height: Dimensions.get('window').height*0.05,
+    borderRadius: 10,
+    backgroundColor: 'green',
+    marginTop: 12,
+    alignItem: 'center',
+    justifyContent:'center'
+  },
+
+  plusIcon: {
+    width: 20,
+    height: 20,
+    tintColor: 'white'
   },
 
 
@@ -192,6 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     padding: 10,
   },
+
   rightAction: {
     alignItems: 'center',
     flex: 1,
