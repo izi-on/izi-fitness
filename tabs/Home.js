@@ -1,11 +1,10 @@
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Animated, Image} from 'react-native'
-import Card from '../custom-components/Card'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated, Image} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Swipeable, RectButton, ScrollView } from 'react-native-gesture-handler';
 import uuid from 'react-native-uuid'
 import { Dimensions } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, TextInput, Card } from 'react-native-paper';
 
 export default function Home({navigation, route}) {
 
@@ -115,28 +114,23 @@ export default function Home({navigation, route}) {
   return (
     
     <View style={{alignItems:'center'}}>
-      <View style={{...styles.container, zIndex: 1, width: Dimensions.get ('window').width,
-      height: Dimensions.get ('window').height*0.15, backgroundColor: 'white'}}>
+      <View style={{...styles.container, zIndex: 1, width: Dimensions.get ('window').width, backgroundColor: 'white'}}>
         <TextInput 
-            style={{
-                height: 40,
-                margin: 12,
-                borderWidth: 1,
-                padding: 10,
-                flex: 1,
-              }}
-            placeHolder='Enter exercise name'
-            onChangeText={setTextS}
-            value={textS}
+          mode='outlined'
+          style={{margin: 10}}
+          label='Enter exercise name'
+          onChangeText={setTextS}
+          value={textS}
         />
         <Button
             mode='contained'
             style={{alignSelf: 'center', marginBottom: 10}}
             onPress={clearAsyncStorage}
+            color='red'
         >Clear all data</Button>  
       </View>
       <View style={{...styles.container, width: Dimensions.get('window').width*0.85, 
-        height: Dimensions.get('window').height*0.55, backgroundColor: 'white', marginTop: 10,
+        height: Dimensions.get('window').height*0.50, backgroundColor: 'white', marginTop: 10,
       }}>
         <FlatList
           data={exercises}
@@ -169,13 +163,15 @@ export default function Home({navigation, route}) {
                       );
                     }}
                   >
-                    <TouchableOpacity 
+                    <Card
                       onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
-                    > 
-                      <Card>
-                          <Text> {item.name} </Text>
-                      </Card>
-                    </TouchableOpacity>
+                      mode='contained'
+                    >
+                      <Card.Title title={item.name} subtitle='Stats go here'/>
+                      <Card.Actions>
+                        <Button></Button>
+                      </Card.Actions>
+                    </Card>
                   </Swipeable>
                 )
               } else {
@@ -185,6 +181,7 @@ export default function Home({navigation, route}) {
 
           }
           keyExtractor={item => item.id}
+          /*
           ItemSeparatorComponent={()=>(
             <View
             style={{alignItems:'center'}}
@@ -196,22 +193,17 @@ export default function Home({navigation, route}) {
             }}></View>
             </View>
           )}
+          */
         />
       </View>
-        <TouchableOpacity
+        <Button
           onPress={() => navigation.navigate('Add exercise', {exercises: exercises}) /*handleCreate*/}
-        >
-          <View style={styles.button}>
-            <View style={{alignItems:'center'}}>
-              <Image
-                style={styles.plusIcon}
-                source={require('../projectAssets/plus.png')}
-                
-              />
-            </View>
-          </View>
-
-        </TouchableOpacity>
+          mode='contained'
+          color='green'
+          style={{margin: 15}}
+          icon='plus'
+          contentStyle={{alignItems:'center'}}
+        >Add</Button>
 
     </View>
     
