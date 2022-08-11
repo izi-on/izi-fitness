@@ -12,6 +12,7 @@ export default function Home({navigation, route}) {
     const [exercises, setExercises] = useState([]) //currently for testing, this will be stored locally or on a server later
     const [rSwitch, setRSwitch] = useState(false)
     const [removed, setRemoved] = useState(false)
+    const cardWidth = Dimensions.get('window').width*0.8;
     //const [filtered, setFiltered] = useState([])
 
     var newExer;
@@ -113,7 +114,7 @@ export default function Home({navigation, route}) {
 
   return (
     
-    <View style={{alignItems:'center'}}>
+    <View style={{alignItems:'center', flex:1}}>
       <View style={{...styles.container, zIndex: 1, width: Dimensions.get ('window').width, backgroundColor: 'white'}}>
         <TextInput 
           mode='outlined'
@@ -123,17 +124,13 @@ export default function Home({navigation, route}) {
           value={textS}
         />
       </View>
-      <View style={{...styles.container, width: Dimensions.get('window').width*0.85, 
-        height: Dimensions.get('window').height, marginTop: 10, borderColor: 'black',
-        borderWidth: 1
-      }}>
-        <FlatList
+        {exercises && <FlatList
           data={exercises}
           renderItem={({item}) => 
             {
               if (item.name.includes(textS)) {
                 return (
-                  <View style={{marginBottom: 5}}>
+                  <View style={{marginBottom: 5, marginTop: 5, width: cardWidth}}>
                     <Swipeable
                       renderRightActions={(progress, dragX) => {
                         const trans = dragX.interpolate({
@@ -142,6 +139,7 @@ export default function Home({navigation, route}) {
                         });
                         return (
                           <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+                            {/*
                             <RectButton
                               style={[styles.rightAction, { 
                                 backgroundColor: 'red',
@@ -153,7 +151,15 @@ export default function Home({navigation, route}) {
                             }]}
                               onPress={() => removeExercise(item.id)}>
                               <Text style={styles.actionText}>Delete</Text>
-                            </RectButton>
+                            </RectButton> */}
+                            <Button
+                              style={[styles.rightAction, { 
+                                backgroundColor: 'red',
+                              }]}
+                              contentStyle={{width: cardWidth, height: 200}}
+                              onPress={() => removeExercise(item.id)}>
+                              <Text style={styles.actionText}>Delete</Text>
+                            </Button>
                           </Animated.View>
         
                         );
@@ -191,14 +197,14 @@ export default function Home({navigation, route}) {
             </View>
           )}
           */
-        />
-      </View>
+        />}
         <Button
-          style={{ position: 'absolute', zIndex: '2', bottom: Dimensions.get('window').height*0.35, right: 15,
+          style={{ position: 'absolute', zIndex: '2', bottom: Dimensions.get('window').height*0.05, right: 15,
                   justifyContent: 'center',
                   shadowColor: 'black', shadowRadius: 20,
                   shadowOpacity: 0.6, width: 200, height: 60
           }}
+          contentStyle={{height: 60}}
           onPress={() => navigation.navigate('Add exercise', {exercises: exercises}) /*handleCreate*/}
           mode='contained'
           color='green'
