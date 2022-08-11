@@ -118,19 +118,14 @@ export default function Home({navigation, route}) {
         <TextInput 
           mode='outlined'
           style={{margin: 10}}
-          label='Enter exercise name'
+          label='Search exercise'
           onChangeText={setTextS}
           value={textS}
         />
-        <Button
-            mode='contained'
-            style={{alignSelf: 'center', marginBottom: 10}}
-            onPress={clearAsyncStorage}
-            color='red'
-        >Clear all data</Button>  
       </View>
       <View style={{...styles.container, width: Dimensions.get('window').width*0.85, 
-        height: Dimensions.get('window').height*0.50, backgroundColor: 'white', marginTop: 10,
+        height: Dimensions.get('window').height, marginTop: 10, borderColor: 'black',
+        borderWidth: 1
       }}>
         <FlatList
           data={exercises}
@@ -138,41 +133,43 @@ export default function Home({navigation, route}) {
             {
               if (item.name.includes(textS)) {
                 return (
-                  <Swipeable
-                    renderRightActions={(progress, dragX) => {
-                      const trans = dragX.interpolate({
-                        inputRange: [0, 50, 100, 101],
-                        outputRange: [-20, 0, 0, 1],
-                      });
-                      return (
-                        <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
-                          <RectButton
-                            style={[styles.rightAction, { 
-                              backgroundColor: 'red',
-                              elevation: 3,
-                              shadowOffset: {width: 1, height: 1},
-                              shadowColor: '#333',
-                              shadowOpacity: 0.3,
-                              shadowRadius: 2,
-                          }]}
-                            onPress={() => removeExercise(item.id)}>
-                            <Text style={styles.actionText}>Delete</Text>
-                          </RectButton>
-                        </Animated.View>
-      
-                      );
-                    }}
-                  >
-                    <Card
-                      onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
-                      mode='contained'
+                  <View style={{marginBottom: 5}}>
+                    <Swipeable
+                      renderRightActions={(progress, dragX) => {
+                        const trans = dragX.interpolate({
+                          inputRange: [0, 50, 100, 101],
+                          outputRange: [-20, 0, 0, 1],
+                        });
+                        return (
+                          <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+                            <RectButton
+                              style={[styles.rightAction, { 
+                                backgroundColor: 'red',
+                                elevation: 3,
+                                shadowOffset: {width: 1, height: 1},
+                                shadowColor: '#333',
+                                shadowOpacity: 0.3,
+                                shadowRadius: 2,
+                            }]}
+                              onPress={() => removeExercise(item.id)}>
+                              <Text style={styles.actionText}>Delete</Text>
+                            </RectButton>
+                          </Animated.View>
+        
+                        );
+                      }}
                     >
-                      <Card.Title title={item.name} subtitle='Stats go here'/>
-                      <Card.Actions>
-                        <Button></Button>
-                      </Card.Actions>
-                    </Card>
-                  </Swipeable>
+                      <Card
+                        onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
+                        mode='contained'
+                      >
+                        <Card.Title title={item.name} subtitle='Stats go here'/>
+                        <Card.Actions>
+                          <Button></Button>
+                        </Card.Actions>
+                      </Card>
+                    </Swipeable>
+                  </View>
                 )
               } else {
                 return 
@@ -197,14 +194,16 @@ export default function Home({navigation, route}) {
         />
       </View>
         <Button
+          style={{ position: 'absolute', zIndex: '2', bottom: Dimensions.get('window').height*0.35, right: 15,
+                  justifyContent: 'center',
+                  shadowColor: 'black', shadowRadius: 20,
+                  shadowOpacity: 0.6, width: 200, height: 60
+          }}
           onPress={() => navigation.navigate('Add exercise', {exercises: exercises}) /*handleCreate*/}
           mode='contained'
           color='green'
-          style={{margin: 15}}
           icon='plus'
-          contentStyle={{alignItems:'center'}}
-        >Add</Button>
-
+        >Add Exercise</Button>
     </View>
     
 
