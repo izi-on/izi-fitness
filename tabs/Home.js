@@ -1,10 +1,11 @@
-import { View, Text, Button, TextInput, FlatList, TouchableOpacity, StyleSheet, Animated, Image} from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Animated, Image} from 'react-native'
 import Card from '../custom-components/Card'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Swipeable, RectButton, ScrollView } from 'react-native-gesture-handler';
 import uuid from 'react-native-uuid'
 import { Dimensions } from 'react-native';
+import { Button } from 'react-native-paper';
 
 export default function Home({navigation, route}) {
 
@@ -129,10 +130,10 @@ export default function Home({navigation, route}) {
             value={textS}
         />
         <Button
-            style={{flex: 1}}
-            title='Clear all data'
+            mode='contained'
+            style={{alignSelf: 'center', marginBottom: 10}}
             onPress={clearAsyncStorage}
-        />  
+        >Clear all data</Button>  
       </View>
       <View style={{...styles.container, width: Dimensions.get('window').width*0.85, 
         height: Dimensions.get('window').height*0.55, backgroundColor: 'white', marginTop: 10,
