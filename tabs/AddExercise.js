@@ -1,38 +1,54 @@
-import { View, Dimensions } from 'react-native'
-import React from 'react'
-import { useState } from 'react'
-import { Snackbar, Text, TextInput, Button } from 'react-native-paper'
+import {
+  View,
+  Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
+import React from "react";
+import { useState } from "react";
+import { Snackbar, Text, TextInput, Button } from "react-native-paper";
 
-export default function AddExercise({navigation, route}) {
+export default function AddExercise({ navigation, route }) {
+  const [name, setName] = useState(null);
+  const [error, setError] = useState(null)
 
-    const [name, setName] = useState(null)
-
-    const handleSubmit = () => {
+  const handleSubmit = () => {
+    try {
         if (name) {
-            if (!route.params.exercises.filter(exercise => {return exercise.name.toLowerCase() === name.toLowerCase()}).length > 0) {
-                navigation.navigate('Home', {exercise: name})
-                setName(null)
+            if (!route.params.exercises.filter((exercise) => {
+                return exercise.name.toLowerCase() === name.toLowerCase();}).length > 0) {
+                navigation.navigate("Home", { exercise: name.trim() });
+                setName(null);
+            } else {
+                throw 'Exercise is already created'
             }
         }
+    } catch (e) {
+        console.log(e)
+        setError(e)
     }
+    
+  };
 
   return (
-    <View style={{alignItems:'center', justifyContent: 'center'}}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+        <Text style={{color: 'red'}}> {error} </Text>
         <TextInput
-            label='Enter exercise name'
-            onChangeText={setName}
-            value={name}
-            style={{width: Dimensions.get('window').width*0.85, margin: 15}}
-            activeOutlineColor='blue'
-            mode="outlined"
+          label="Enter exercise name"
+          onChangeText={setName}
+          value={name}
+          style={{ width: Dimensions.get("window").width * 0.85, margin: 15 }}
+          activeOutlineColor="blue"
+          mode="outlined"
         />
         <Button
-            title='Submit exercise'
-            onPress={handleSubmit}
-            mode='contained'
-            color='blue'
-        >Add the exercise</Button>
-        
-    </View>
-  )
+          onPress={handleSubmit}
+          color="blue"
+        >
+          Submit exercise
+        </Button>
+      </View>
+    </TouchableWithoutFeedback>
+  );
 }

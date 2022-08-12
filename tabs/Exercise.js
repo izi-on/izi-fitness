@@ -25,8 +25,8 @@ export default function Exercise({ navigation, route }) {
   const _getData = async () => {
     try {
       jsonValue = await AsyncStorage.getItem("exercise-" + exId);
-      res = jsonValue !== null ? JSON.parse(jsonValue) : null;
-      SETDATA(res.data); //CHECK IF NULL
+      res = (jsonValue !== null) ? JSON.parse(jsonValue) : null;
+      if (res) {SETDATA(res.data);} else {SETDATA(null)} //CHECK IF NULL
     } catch (e) {
       console.log(e);
     }
@@ -165,7 +165,7 @@ export default function Exercise({ navigation, route }) {
         Add set
       </Button>
 
-      <FlatList
+      {DATA && <FlatList
         style={{ width: Dimensions.get("window").width }}
         data={DATA}
         renderItem={({ item }) => {
@@ -247,7 +247,8 @@ export default function Exercise({ navigation, route }) {
           );
         }}
         keyExtractor={(item) => item.id}
-      />
+      />}
+      {!DATA && <Text style={{top: 10}}>Add a set to start tracking!</Text>}
     </View>
   );
 }
