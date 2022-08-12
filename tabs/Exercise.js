@@ -140,9 +140,16 @@ export default function Exercise({ navigation, route }) {
                   time: returnData.time
                 },
               ],
-            });
+            })
+            newData.sort((a,b) => {
+              if (a.date > b.date) {return -1}
+              if (a.date < b.date) {return 1}
+              return 0
+            })
+    
           }
         }
+
 
         console.log("THE NEW DATA IS: ", newData);
 

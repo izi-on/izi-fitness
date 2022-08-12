@@ -105,12 +105,13 @@ export default function Home({ navigation, route }) {
     }
   }, [removed]);
 
+  //handle new exercise
   useEffect(() => {
     if (newExer) {
       const exercise = {
         name: newExer,
         id: uuid.v4(),
-        lastModifiedDate: new Date().toDateString(),
+        lastModifiedDate: new Date().toLocaleDateString(),
         lastModifiedTime: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -254,12 +255,14 @@ export default function Home({ navigation, route }) {
             zIndex: "2",
             bottom: Dimensions.get("window").height * 0.05,
             right: 15,
+            bottom: 15,
             justifyContent: "center",
             shadowColor: "black",
             shadowRadius: 20,
             shadowOpacity: 0.6,
             width: 100,
             height: 60,
+
           }}
           contentStyle={{ height: 60 }}
           onPress={

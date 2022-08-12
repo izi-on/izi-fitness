@@ -17,7 +17,7 @@ export default function AddExercise({ navigation, route }) {
         if (name) {
             if (!route.params.exercises.filter((exercise) => {
                 return exercise.name.toLowerCase() === name.toLowerCase();}).length > 0) {
-                navigation.navigate("Home", { exercise: name.trim() });
+                navigation.navigate("Home", { exercise: name.trim().charAt(0).toUpperCase() + name.trim().slice(1).toLowerCase() });
                 setName(null);
             } else {
                 throw 'Exercise is already created'
