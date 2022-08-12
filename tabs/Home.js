@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Swipeable, RectButton, ScrollView } from 'react-native-gesture-handler';
 import uuid from 'react-native-uuid'
 import { Dimensions } from 'react-native';
-import { Button, TextInput, Card } from 'react-native-paper';
+import { Button, TextInput, Card, List } from 'react-native-paper';
 
 export default function Home({navigation, route}) {
 
@@ -93,7 +93,10 @@ export default function Home({navigation, route}) {
 
     useEffect(() => {
       if (newExer) {
-        const exercise = {name: newExer, id: uuid.v4(), date: new Date().toDateString()}
+        const exercise = {name: newExer, id: uuid.v4(), 
+          lastModifiedDate: new Date().toDateString(),
+          lastModifiedTime: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        }
         _addExercise(exercise)
         pageRefresh()
         setTextS('')
@@ -126,6 +129,7 @@ export default function Home({navigation, route}) {
         />
       </View>
         {exercises && <FlatList
+          showsVerticalScrollIndicator='false'
           data={exercises}
           renderItem={({item}) => 
             {
@@ -169,8 +173,15 @@ export default function Home({navigation, route}) {
                       <Card
                         onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
                         mode='contained'
+                        left={() => <List.Icon icon="arrow-left"/>}
                       >
-                        <Card.Title title={item.name} subtitle={`Last modified: ${item.date}`}/>
+                        <Card.Title title={item.name}/>
+                        <Card.Content>
+                          <View>
+                            <Text>Last modified:</Text>
+                            <Text>{item.lastModifiedDate} at {item.lastModifiedTime}</Text>
+                          </View>
+                        </Card.Content>
                         <Card.Actions>
                           <Button></Button>
                         </Card.Actions>
@@ -203,14 +214,14 @@ export default function Home({navigation, route}) {
           style={{ position: 'absolute', zIndex: '2', bottom: Dimensions.get('window').height*0.05, right: 15,
                   justifyContent: 'center',
                   shadowColor: 'black', shadowRadius: 20,
-                  shadowOpacity: 0.6, width: 200, height: 60
+                  shadowOpacity: 0.6, width: 100, height: 60
           }}
           contentStyle={{height: 60}}
           onPress={() => navigation.navigate('Add exercise', {exercises: exercises}) /*handleCreate*/}
           mode='contained'
           color='green'
           icon='plus'
-        >Add Exercise</Button>
+        >Add</Button>
     </View>
     
 
