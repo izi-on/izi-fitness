@@ -13,7 +13,7 @@ export default function Exercise({ navigation, route }) {
   console.log("THE NAME IS", name);
 
   const [DATA, SETDATA] = useState([]);
-  const [rerender, triggerRerender] = useState(false)
+  const [rerender, triggerRerender] = useState(false);
 
   //GET DATA FUNCTION
   const _getData = async () => {
@@ -91,7 +91,7 @@ export default function Exercise({ navigation, route }) {
     _getData();
   }, []);
 
-  //ADD DATA or MODIFY DATA 
+  //ADD DATA or MODIFY DATA
   useEffect(() => {
     const returnData = route.params.returnData;
 
@@ -131,12 +131,22 @@ export default function Exercise({ navigation, route }) {
                   time: returnData.time,
                   timeRaw: returnData.timeRaw,
                 });
+
+                item.sets.sort((a, b) => {
+                  if (a.time > b.time) {
+                    return -1;
+                  }
+                  if (a.time < b.time) {
+                    return 1;
+                  }
+                  return 0;
+                });
               }
 
               return item;
             });
           } else if (returnData.type === "modify") {
-            toInsert = false
+            toInsert = false;
             newData = prevData;
             const itemToModifyIndex = newData.findIndex((item) => {
               return (
@@ -157,6 +167,16 @@ export default function Exercise({ navigation, route }) {
               time: returnData.time,
               timeRaw: returnData.timeRaw,
             };
+
+            newData[itemToModifyIndex].sets.sort((a, b) => {
+              if (a.time > b.time) {
+                return -1;
+              }
+              if (a.time < b.time) {
+                return 1;
+              }
+              return 0;
+            });
           }
 
           if (toInsert) {
@@ -192,7 +212,11 @@ export default function Exercise({ navigation, route }) {
 
         return newData;
       });
-      if (returnData.type ==='modify') {triggerRerender(rerenderP => {return !rerenderP})} //modified data not detected, need to force flatlist refresh
+      if (returnData.type === "modify") {
+        triggerRerender((rerenderP) => {
+          return !rerenderP;
+        });
+      } //modified data not detected, need to force flatlist refresh
     }
   }, [route.params.returnData]);
 
@@ -206,7 +230,7 @@ export default function Exercise({ navigation, route }) {
       >
         Add set
       </Button>
-      {console.log('RENDERING THE DATA: ', DATA)}
+      {console.log("RENDERING THE DATA: ", DATA)}
       {DATA && (
         <FlatList
           style={{ width: Dimensions.get("window").width }}
