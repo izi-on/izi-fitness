@@ -1,10 +1,4 @@
-import {
-  View,
-  FlatList,
-  Animated,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, FlatList, Animated, StyleSheet, Dimensions } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RectButton } from "react-native-gesture-handler";
@@ -18,15 +12,19 @@ export default function Exercise({ navigation, route }) {
 
   console.log("THE NAME IS", name);
 
-  //for testing purposes, this will be extracted later from local db
   const [DATA, SETDATA] = useState([]);
+  const [rerender, triggerRerender] = useState(false)
 
   //GET DATA FUNCTION
   const _getData = async () => {
     try {
-      jsonValue = await AsyncStorage.getItem("exercise-" + exId);
-      res = (jsonValue !== null) ? JSON.parse(jsonValue) : null;
-      if (res) {SETDATA(res.data);} else {SETDATA(null)} //CHECK IF NULL
+      const jsonValue = await AsyncStorage.getItem("exercise-" + exId);
+      const res = jsonValue !== null ? JSON.parse(jsonValue) : null;
+      if (res) {
+        SETDATA(res.data);
+      } else {
+        SETDATA(null);
+      } //CHECK IF NULL
     } catch (e) {
       console.log(e);
     }
@@ -35,7 +33,7 @@ export default function Exercise({ navigation, route }) {
   //STORE DATA
   const _storeData = async (newData) => {
     try {
-      jsonValue = JSON.stringify({ data: newData });
+      const jsonValue = JSON.stringify({ data: newData });
       await AsyncStorage.setItem("exercise-" + exId, jsonValue);
     } catch (e) {
       console.log(e);
@@ -44,7 +42,7 @@ export default function Exercise({ navigation, route }) {
 
   //HANDLE ADDING DATA, LOGIC IS IN USE EFFECT
   const handleAdd = () => {
-    navigation.navigate("Add set", { name: name, id: exId });
+    navigation.navigate("Add set", { name: name, id: exId, type: "add" });
   };
 
   //REMOVE DATA
@@ -77,24 +75,32 @@ export default function Exercise({ navigation, route }) {
     });
   };
 
+  //send modifying request
+  const modifySet = (set) => {
+    navigation.navigate("Add set", {
+      type: "modify",
+      name: name,
+      id: exId,
+      setToModify: set,
+    });
+  };
+
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
     console.log("INIT LOAD DETECTED, GET DATA");
     _getData();
   }, []);
 
-  //ADD DATA
+  //ADD DATA or MODIFY DATA 
   useEffect(() => {
     const returnData = route.params.returnData;
 
-    //ADD DATA?
     if (returnData) {
-      console.log("NEW SET DETECTED, ADDING SET");
-
+      var newData;
       SETDATA((prevData) => {
         console.log("THE PREVIOUS DATA WAS: ", prevData);
 
-        var newData;
+        //var newData;
 
         if (!prevData) {
           newData = [
@@ -106,27 +112,52 @@ export default function Exercise({ navigation, route }) {
                   reps: returnData.reps,
                   weight: returnData.weight,
                   id: returnData.id,
-                  time: returnData.time
+                  time: returnData.time,
+                  timeRaw: returnData.timeRaw,
                 },
               ],
             },
           ];
         } else {
           let toInsert = true; //if its a new date
+          if (returnData.type === "add") {
+            newData = prevData.map((item) => {
+              if (returnData.date.toLowerCase() === item.date.toLowerCase()) {
+                toInsert = false;
+                item.sets.push({
+                  reps: returnData.reps,
+                  weight: returnData.weight,
+                  id: returnData.id,
+                  time: returnData.time,
+                  timeRaw: returnData.timeRaw,
+                });
+              }
 
-          newData = prevData.map((item) => {
-            if (returnData.date.toLowerCase() === item.date.toLowerCase()) {
-              toInsert = false;
-              item.sets.push({
-                reps: returnData.reps,
-                weight: returnData.weight,
-                id: returnData.id,
-                time: returnData.time
-              });
-            }
-
-            return item;
-          });
+              return item;
+            });
+          } else if (returnData.type === "modify") {
+            toInsert = false
+            newData = prevData;
+            const itemToModifyIndex = newData.findIndex((item) => {
+              return (
+                item.sets.filter((set) => {
+                  return set.id === returnData.id;
+                }).length > 0
+              );
+            });
+            const setToModifyIndex = newData[itemToModifyIndex].sets.findIndex(
+              (set) => {
+                return set.id === returnData.id;
+              }
+            );
+            newData[itemToModifyIndex].sets[setToModifyIndex] = {
+              reps: returnData.reps,
+              weight: returnData.weight,
+              id: returnData.id,
+              time: returnData.time,
+              timeRaw: returnData.timeRaw,
+            };
+          }
 
           if (toInsert) {
             newData.push({
@@ -137,19 +168,22 @@ export default function Exercise({ navigation, route }) {
                   reps: returnData.reps,
                   weight: returnData.weight,
                   id: returnData.id,
-                  time: returnData.time
+                  time: returnData.time,
+                  timeRaw: returnData.timeRaw,
                 },
               ],
-            })
-            newData.sort((a,b) => {
-              if (a.date > b.date) {return -1}
-              if (a.date < b.date) {return 1}
-              return 0
-            })
-    
+            });
+            newData.sort((a, b) => {
+              if (a.date > b.date) {
+                return -1;
+              }
+              if (a.date < b.date) {
+                return 1;
+              }
+              return 0;
+            });
           }
         }
-
 
         console.log("THE NEW DATA IS: ", newData);
 
@@ -158,6 +192,7 @@ export default function Exercise({ navigation, route }) {
 
         return newData;
       });
+      if (returnData.type ==='modify') {triggerRerender(rerenderP => {return !rerenderP})} //modified data not detected, need to force flatlist refresh
     }
   }, [route.params.returnData]);
 
@@ -171,91 +206,111 @@ export default function Exercise({ navigation, route }) {
       >
         Add set
       </Button>
-
-      {DATA && <FlatList
-        style={{ width: Dimensions.get("window").width }}
-        data={DATA}
-        renderItem={({ item }) => {
-          let totalVolume = 0; 
-          item.sets.forEach(set => {
-            totalVolume += set.reps*set.weight
-          });
-          return (
-            <View style={{ alignItems: "center" }}>
-              <Card
-                mode="elevated"
-                elevation={3}
-                style={{
-                  width: Dimensions.get("window").width * 0.9,
-                  marginTop: 10,
-                }}
-              >
-                {console.log("RENDERING ITEM: ", item.id)}
-                <Card.Title
-                  title={item.date}
-                  subtitle={`Total volume: ${totalVolume}`}
-                  left={() => <List.Icon icon="dumbbell" />}
-                />
-                <Divider />
-                {item.sets.map((set) => (
-                  <View key={set.id} styles={{ flex: 1 }}>
-                    {console.log("RENDERING SET: ", set.id)}
-                    <Swipeable
-                      renderRightActions={(progress, dragX) => {
-                        const trans = dragX.interpolate({
-                          inputRange: [0, 50, 100, 101],
-                          outputRange: [-20, 0, 0, 1],
-                        });
-                        return (
-                          <Animated.View
-                            style={{ flex: 1, transform: [{ translateX: 0 }] }}
-                          >
-                            <RectButton
-                              style={[
-                                styles.rightAction,
-                                {
-                                  backgroundColor: "red",
-                                  elevation: 3,
-                                },
-                              ]}
-                              onPress={() => removeData(item.id, set.id)}
+      {console.log('RENDERING THE DATA: ', DATA)}
+      {DATA && (
+        <FlatList
+          style={{ width: Dimensions.get("window").width }}
+          data={DATA}
+          renderItem={({ item }) => {
+            let totalVolume = 0;
+            item.sets.forEach((set) => {
+              totalVolume += set.reps * set.weight;
+            });
+            return (
+              <View style={{ alignItems: "center" }}>
+                <Card
+                  mode="elevated"
+                  elevation={3}
+                  style={{
+                    width: Dimensions.get("window").width * 0.9,
+                    marginTop: 10,
+                  }}
+                >
+                  {console.log("RENDERING ITEM: ", item.id)}
+                  <Card.Title
+                    title={item.date}
+                    subtitle={`Total volume: ${totalVolume}`}
+                    left={() => <List.Icon icon="dumbbell" />}
+                  />
+                  <Divider />
+                  {item.sets.map((set) => (
+                    <View key={set.id} styles={{ flex: 1 }}>
+                      {console.log("RENDERING SET: ", set.id)}
+                      <Swipeable
+                        renderRightActions={(progress, dragX) => {
+                          const trans = dragX.interpolate({
+                            inputRange: [0, 50, 100, 101],
+                            outputRange: [-20, 0, 0, 1],
+                          });
+                          return (
+                            <Animated.View
+                              style={{
+                                flex: 1,
+                                transform: [{ translateX: 0 }],
+                              }}
                             >
-                              <Text style={styles.actionText}>Delete</Text>
-                            </RectButton>
-                          </Animated.View>
-                        );
-                      }}
-                    >
-                      <View style={{ backgroundColor: "white" }}>
-                        <List.Item
-                          title={() => {
-                            return (
-                              <View>
-                                <Text style={{ fontWeight: 'bold', color: "#FFA100" }}>
-                                  Reps: {set.reps}
+                              <RectButton
+                                style={[
+                                  styles.rightAction,
+                                  {
+                                    backgroundColor: "red",
+                                    elevation: 3,
+                                  },
+                                ]}
+                                onPress={() => removeData(item.id, set.id)}
+                              >
+                                <Text style={styles.actionText}>Delete</Text>
+                              </RectButton>
+                            </Animated.View>
+                          );
+                        }}
+                      >
+                        <View style={{ backgroundColor: "white" }}>
+                          <List.Item
+                            onPress={() => modifySet(set)}
+                            title={() => {
+                              return (
+                                <View>
+                                  <Text
+                                    style={{
+                                      fontWeight: "bold",
+                                      color: "#FFA100",
+                                    }}
+                                  >
+                                    Reps: {set.reps}
+                                  </Text>
+                                  <Text
+                                    style={{ fontWeight: "bold", color: "red" }}
+                                  >
+                                    Sets: {set.weight}
+                                  </Text>
+                                </View>
+                              );
+                            }}
+                            left={() => {
+                              return <List.Icon icon="arrow-left" />;
+                            }}
+                            right={() => {
+                              return (
+                                <Text style={{ top: 20, right: 20 }}>
+                                  {set.time}
                                 </Text>
-                                <Text style={{ fontWeight: 'bold', color: "red" }}>
-                                  Sets: {set.weight}
-                                </Text>
-                              </View>
-                            );
-                          }}
-                          left={() => {
-                            return <List.Icon icon="arrow-left" />;
-                          }}
-                          right={() => {return <Text style={{top: 20, right: 20}}>{set.time}</Text>}}
-                        />
-                      </View>
-                    </Swipeable>
-                  </View>
-                ))}
-              </Card>
-            </View>
-          );
-        }}
-        keyExtractor={(item) => item.id}
-      />}
-      {!DATA && <Text style={{top: 10}}>Add a set to start tracking!</Text>}
+                              );
+                            }}
+                          />
+                        </View>
+                      </Swipeable>
+                    </View>
+                  ))}
+                </Card>
+              </View>
+            );
+          }}
+          keyExtractor={(item) => item.id}
+          extraData={rerender} //if set is modified, need to force this to rerender
+        />
+      )}
+      {!DATA && <Text style={{ top: 10 }}>Add a set to start tracking!</Text>}
     </View>
   );
 }

@@ -14,10 +14,17 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 export default function AddSet({ navigation, route }) {
+  const type = route.params.type;
   const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState(new Date());
-  const [tReps, setTReps] = useState(null);
-  const [tWeight, setTWeight] = useState(null);
+  const [time, setTime] = useState(
+    type === "modify" ? new Date(route.params.setToModify.timeRaw) : new Date()
+);
+  const [tReps, setTReps] = useState(
+    type === "modify" ? route.params.setToModify.reps : null
+  );
+  const [tWeight, setTWeight] = useState(
+    type === "modify" ? route.params.setToModify.weight : null
+  );
 
   const handleSet = () => {
     if (date && tReps && tWeight) {
@@ -26,12 +33,14 @@ export default function AddSet({ navigation, route }) {
         name: route.params.name,
         id: route.params.id,
         returnData: {
-          id: uuid.v4(),
+          type: type,
+          id: type === "modify" ? route.params.setToModify.id : uuid.v4(),
           date: date.toLocaleDateString(),
           time: time.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           }),
+          timeRaw: time.toISOString(),
           reps: tReps,
           weight: tWeight,
         },
@@ -91,11 +100,14 @@ export default function AddSet({ navigation, route }) {
       />
     </View>
     */
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
-      <View style={{flex: 1}}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <List.Section>
-          <List.Subheader>Enter set information:</List.Subheader>
-          <List.Item
+          <List.Subheader>
+            {type==='add' && <Text>Enter set information:</Text>}
+            {type==='modify' && <Text>Modify set:</Text>}
+          </List.Subheader>
+          {type==='add' && <List.Item
             title={"Date:"}
             left={() => <List.Icon icon="calendar" />}
             right={() => (
@@ -106,7 +118,7 @@ export default function AddSet({ navigation, route }) {
                 onChange={onChange}
               />
             )}
-          />
+          />}
           <List.Item
             title={"Time:"}
             left={() => <List.Icon icon="clock" />}
@@ -150,8 +162,11 @@ export default function AddSet({ navigation, route }) {
           <Divider />
         </List.Section>
 
-        <Button title="Record set" onPress={handleSet} color="blue"
-        style={{width: 130, alignSelf:'center'}}
+        <Button
+          title="Record set"
+          onPress={handleSet}
+          color="blue"
+          style={{ width: 130, alignSelf: "center" }}
         >
           Submit set
         </Button>
