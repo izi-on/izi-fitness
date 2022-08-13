@@ -27,6 +27,7 @@ export default function Home({ navigation, route }) {
   const cardWidth = Dimensions.get("window").width * 0.8;
   //const [filtered, setFiltered] = useState([])
 
+  /*
   var newExer;
   function setVar() {
     try {
@@ -36,6 +37,7 @@ export default function Home({ navigation, route }) {
     }
   }
   setVar();
+  */
 
   const _addExercise = async (exercise) => {
     try {
@@ -117,7 +119,8 @@ export default function Home({ navigation, route }) {
 
   //handle new exercise
   useEffect(() => {
-    if (newExer) {
+    if (route.params?.exercise) {
+      const newExer = route.params.exercise
       console.log('trigger new exercise')
       const exercise = {
         name: newExer,
@@ -131,8 +134,9 @@ export default function Home({ navigation, route }) {
       _addExercise(exercise);
       pageRefresh();
       setTextS("");
+      route.params.exercise = null
     }
-  }, [newExer]);
+  }, [route.params?.exercise]);
 
   /*
     useEffect(() => {
