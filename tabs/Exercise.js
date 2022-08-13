@@ -5,6 +5,7 @@ import { RectButton } from "react-native-gesture-handler";
 import { Swipeable } from "react-native-gesture-handler";
 import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
+import _ from "lodash";
 
 export default function Exercise({ navigation, route }) {
   const name = route.params.name;
@@ -14,6 +15,7 @@ export default function Exercise({ navigation, route }) {
 
   const [DATA, SETDATA] = useState([]);
   const [rerender, triggerRerender] = useState(false);
+  const [modified, setModified] = useState(false) //if the data has been modified
 
   //GET DATA FUNCTION
   const _getData = async () => {
@@ -73,6 +75,7 @@ export default function Exercise({ navigation, route }) {
         return newData;
       }
     });
+    setModified(true)
   };
 
   //send modifying request
@@ -98,9 +101,7 @@ export default function Exercise({ navigation, route }) {
     if (returnData) {
       var newData;
       SETDATA((prevData) => {
-        console.log("THE PREVIOUS DATA WAS: ", prevData);
-
-        //var newData;
+        //console.log("THE PREVIOUS DATA WAS: ", prevData);
 
         if (!prevData) {
           newData = [
@@ -118,6 +119,7 @@ export default function Exercise({ navigation, route }) {
               ],
             },
           ];
+          setModified(true)
         } else {
           let toInsert = true; //if its a new date
           if (returnData.type === "add") {
@@ -145,6 +147,7 @@ export default function Exercise({ navigation, route }) {
 
               return item;
             });
+            setModified(true)
           } else if (returnData.type === "modify") {
             toInsert = false;
             newData = prevData;
@@ -160,6 +163,9 @@ export default function Exercise({ navigation, route }) {
                 return set.id === returnData.id;
               }
             );
+            
+            newData[itemToModifyIndex].sets[setToModifyIndex]
+            const oldSet = {...newData[itemToModifyIndex].sets[setToModifyIndex]}
             newData[itemToModifyIndex].sets[setToModifyIndex] = {
               reps: returnData.reps,
               weight: returnData.weight,
@@ -167,6 +173,11 @@ export default function Exercise({ navigation, route }) {
               time: returnData.time,
               timeRaw: returnData.timeRaw,
             };
+
+            //check if the content has been modified 
+            if (!_.isEqual(newData[itemToModifyIndex].sets[setToModifyIndex], oldSet)) {
+              setModified(true)
+            }
 
             newData[itemToModifyIndex].sets.sort((a, b) => {
               if (a.time > b.time) {
@@ -205,7 +216,7 @@ export default function Exercise({ navigation, route }) {
           }
         }
 
-        console.log("THE NEW DATA IS: ", newData);
+        //console.log("THE NEW DATA IS: ", newData);
 
         //store to local db
         _storeData(newData);
@@ -220,6 +231,43 @@ export default function Exercise({ navigation, route }) {
     }
   }, [route.params.returnData]);
 
+  const _handleModify = async () => {
+    try {
+
+      //get exercise 
+      const jsonValue = await AsyncStorage.getItem("exercises");
+      const res = JSON.parse(jsonValue);
+      console.log('received is: ', res)
+      //change exercise properties
+      const curExerIndex = res.data.findIndex(exercise => exercise.id === exId)
+      res.data[curExerIndex].lastModifiedDate = new Date().toLocaleDateString()
+      res.data[curExerIndex].lastModifiedTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      console.log('new res is: ', res)
+      //save exercise
+      console.log('sending back...')
+      const jsonSend = JSON.stringify(res)
+      await AsyncStorage.setItem("exercises", jsonSend)
+      console.log('sent')
+      
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  //set last modified date
+  useEffect(() => {
+    if (modified) {
+      console.log('TRIGGER LAST MODIFIED')
+      //set last modified label
+      _handleModify()      
+    }
+    setModified(false)
+
+  }, [modified])
+
   return (
     <View style={{ alignItems: "center", flex: 1 }}>
       <Button
@@ -230,7 +278,6 @@ export default function Exercise({ navigation, route }) {
       >
         Add set
       </Button>
-      {console.log("RENDERING THE DATA: ", DATA)}
       {DATA && (
         <FlatList
           style={{ width: Dimensions.get("window").width }}
@@ -250,7 +297,6 @@ export default function Exercise({ navigation, route }) {
                     marginTop: 10,
                   }}
                 >
-                  {console.log("RENDERING ITEM: ", item.id)}
                   <Card.Title
                     title={item.date}
                     subtitle={`Total volume: ${totalVolume}`}
@@ -259,7 +305,6 @@ export default function Exercise({ navigation, route }) {
                   <Divider />
                   {item.sets.map((set) => (
                     <View key={set.id} styles={{ flex: 1 }}>
-                      {console.log("RENDERING SET: ", set.id)}
                       <Swipeable
                         renderRightActions={(progress, dragX) => {
                           const trans = dragX.interpolate({
@@ -306,7 +351,7 @@ export default function Exercise({ navigation, route }) {
                                   <Text
                                     style={{ fontWeight: "bold", color: "red" }}
                                   >
-                                    Sets: {set.weight}
+                                    Weight: {set.weight}
                                   </Text>
                                 </View>
                               );

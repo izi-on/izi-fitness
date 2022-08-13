@@ -92,13 +92,23 @@ export default function Home({ navigation, route }) {
     AsyncStorage.clear();
   };
 
+  //check for modified data
+  useEffect(() => {
+    console.log('trigger modif in home')
+    const unsub = navigation.addListener('focus', () => {
+      _getExercises()
+    })
+  }, [navigation])
+
   //refresh also runs on start
   useEffect(() => {
+    console.log('trigger refresh in home')
     _getExercises();
   }, [rSwitch]);
 
   useEffect(() => {
     if (removed) {
+      console.log('trigger remove in home')
       setRemoved(false);
       _addExercise(); //refresh db
       pageRefresh();
@@ -108,6 +118,7 @@ export default function Home({ navigation, route }) {
   //handle new exercise
   useEffect(() => {
     if (newExer) {
+      console.log('trigger new exercise')
       const exercise = {
         name: newExer,
         id: uuid.v4(),
