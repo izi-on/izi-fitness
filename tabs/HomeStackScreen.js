@@ -18,7 +18,7 @@ export default function HomeStackScreen() {
     >
         <Stack.Screen name="Home" component={Home} options={{ unmountOnBlur: true, headerShown: false }}
         />
-        <Stack.Screen name="Exercise" component={Exercise} options={{ unmountOnBlur: true, headerShown: true}}/>
+        <Stack.Screen name="Exercise" component={Exercise} options={{ unmountOnBlur: true, headerShown: false}}/>
         <Stack.Screen name="Add set" component={AddSet} options={{ unmountOnBlur: true, headerShown: false }}/>
         <Stack.Screen name="Add exercise" component={AddExercise} options={{ unmountOnBlur: true, headerShown: false }}/>
     </Stack.Navigator>

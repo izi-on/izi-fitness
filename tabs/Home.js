@@ -93,7 +93,7 @@ export default function Home({navigation, route}) {
 
     useEffect(() => {
       if (newExer) {
-        const exercise = {name: newExer, id: uuid.v4()}
+        const exercise = {name: newExer, id: uuid.v4(), date: new Date().toDateString()}
         _addExercise(exercise)
         pageRefresh()
         setTextS('')
@@ -120,6 +120,7 @@ export default function Home({navigation, route}) {
           mode='outlined'
           style={{margin: 10}}
           label='Search exercise'
+          activeOutlineColor='blue'
           onChangeText={setTextS}
           value={textS}
         />
@@ -130,7 +131,7 @@ export default function Home({navigation, route}) {
             {
               if (item.name.includes(textS)) {
                 return (
-                  <View style={{marginBottom: 5, marginTop: 5, width: cardWidth}}>
+                  <View style={{marginTop: 5, width: cardWidth}}>
                     <Swipeable
                       renderRightActions={(progress, dragX) => {
                         const trans = dragX.interpolate({
@@ -169,7 +170,7 @@ export default function Home({navigation, route}) {
                         onPress={() => {navigation.navigate('Exercise', {name: item.name, id: item.id});}}
                         mode='contained'
                       >
-                        <Card.Title title={item.name} subtitle='Stats go here'/>
+                        <Card.Title title={item.name} subtitle={`Last modified: ${item.date}`}/>
                         <Card.Actions>
                           <Button></Button>
                         </Card.Actions>

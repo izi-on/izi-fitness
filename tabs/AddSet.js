@@ -1,14 +1,16 @@
-import { View, Text, TextInput, Button } from 'react-native'
+import { View} from 'react-native'
 import React, { useState } from 'react'
 import { TabRouter } from '@react-navigation/native'
 import uuid from 'react-native-uuid'
+import { IconButton, List, Text, Divider, TextInput, Button } from 'react-native-paper'
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function AddSet({navigation, route}) {
 
-    const [date, setDate] = useState(null)
+    const [date, setDate] = useState(new Date())
     const [tReps, setTReps] = useState(null)
     const [tWeight, setTWeight] = useState(null)
-
+    const [show, setShow] = useState(false)
 
     const handleSet = () => {
         if (date && tReps && tWeight) {
@@ -20,7 +22,7 @@ export default function AddSet({navigation, route}) {
                     returnData: {
 
                         id: uuid.v4(),
-                        date: date,
+                        date: date.toLocaleDateString(),
                         reps: tReps,
                         weight: tWeight
 
@@ -30,9 +32,14 @@ export default function AddSet({navigation, route}) {
         } 
     }
 
+    const onChange = (event, selectedDate) => {
+      const currentDate = selectedDate;
+      setDate(currentDate);
+    };
+
   return (
+    /*
     <View>
-      <Text>Add set:</Text>
       <TextInput
         style={{
             height: 40,
@@ -71,5 +78,55 @@ export default function AddSet({navigation, route}) {
         onPress={handleSet}
       />
     </View>
+    */
+   <View>
+    <List.Section>
+      <List.Subheader>Enter set information:</List.Subheader>
+      <List.Item
+        title={'Date:'}
+        left = {() => <List.Icon icon='calendar'/>}
+        right = {() => <DateTimePicker
+          style={{top:12, right: 15, width: 200}}
+          testID="dateTimePicker"
+          value={date}
+          onChange={onChange}
+        />}
+      />
+      <Divider/>
+      <List.Item
+        title={'Reps:'}
+        left = {() => <List.Icon icon='dumbbell'/>}
+        right = {() => <TextInput 
+          style={{minWidth: 45, maxWidth: 200, right: 15}}
+          keyboardType='numeric'
+          onChangeText={setTReps}
+          value={tReps}
+          activeOutlineColor='blue'
+        />}
+      />
+      <List.Item 
+        title='Weight: '
+        left= {() => <List.Icon icon='weight'/>}
+        right = {() => <TextInput 
+          style={{minWidth: 45, right: 15}}
+          keyboardType='numeric'
+          onChangeText={setTWeight}
+          value={tWeight}
+          activeOutlineColor='blue'
+        />}
+      />
+      <Divider/>
+
+    </List.Section>
+
+    <Button
+      title='Record set'
+      onPress={handleSet}
+      color='blue'
+    >
+      Submit set
+    </Button>
+
+   </View>
   )
 }

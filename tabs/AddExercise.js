@@ -1,7 +1,7 @@
-import { View, Text, Button } from 'react-native'
+import { View, Dimensions } from 'react-native'
 import React from 'react'
-import { TextInput } from 'react-native-gesture-handler'
 import { useState } from 'react'
+import { Snackbar, Text, TextInput, Button } from 'react-native-paper'
 
 export default function AddExercise({navigation, route}) {
 
@@ -17,22 +17,22 @@ export default function AddExercise({navigation, route}) {
     }
 
   return (
-    <View>
-        <Text>Enter exercise name:</Text>
+    <View style={{alignItems:'center', justifyContent: 'center'}}>
         <TextInput
-            style={{
-                height: 40,
-                margin: 12,
-                borderWidth: 1,
-                padding: 10,
-            }}
+            label='Enter exercise name'
             onChangeText={setName}
             value={name}
+            style={{width: Dimensions.get('window').width*0.85, margin: 15}}
+            activeOutlineColor='blue'
+            mode="outlined"
         />
         <Button
             title='Submit exercise'
             onPress={handleSubmit}
-        />
+            mode='contained'
+            color='blue'
+        >Add the exercise</Button>
+        
     </View>
   )
 }
