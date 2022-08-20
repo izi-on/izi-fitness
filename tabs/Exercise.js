@@ -12,7 +12,7 @@ export default function Exercise({ navigation, route }) {
   const name = route.params.name;
   const exId = route.params.id;
 
-  console.log("THE NAME IS", name);
+  //console.log("THE NAME IS", name);
 
   const [DATA, SETDATA] = useState([]);
   const [rerender, triggerRerender] = useState(false);
@@ -21,7 +21,7 @@ export default function Exercise({ navigation, route }) {
   const [theme, setTheme] = useState('light')
 
   /*
-  
+
   //GET DATA FUNCTION
   const _getData = async (key) => {
     try {
@@ -97,19 +97,21 @@ export default function Exercise({ navigation, route }) {
 
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
-    console.log("INIT LOAD DETECTED, GET DATA");
-    //load data
-    var data;
-    (async () => {
-      data = await _getData("exercise-" + exId)
-      SETDATA(data)
+    const unsub = navigation.addListener('focus', () => {
+      console.log('focused exercise')
+      //load data
+      var data;
+      (async () => {
+        console.log('getting data')
+        data = await _getData("exercise-" + exId)
+        SETDATA(data)
+        data = await _getData("settings")
+        console.log(data)
+        setUnit(data.unit)
+        setTheme(data.theme)
+      })()
     })
-    //get unit (metric or pound) and theme (light or dark)
-    (async () => {
-      data = await _getData("settings")
-      setUnit(data.unit)
-      setTheme(data.theme)
-    })
+    return unsub
 
   }, []);
 
@@ -247,6 +249,7 @@ export default function Exercise({ navigation, route }) {
           return !rerenderP;
         });
       } //modified data not detected, need to force flatlist refresh
+      route.params.returnData = null
     }
   }, [route.params.returnData]);
 
@@ -304,7 +307,7 @@ export default function Exercise({ navigation, route }) {
           renderItem={({ item }) => {
             let totalVolume = 0;
             item.sets.forEach((set) => {
-              totalVolume += set.reps * set.weight;
+              totalVolume += Math.round((unit==='imperial')?set.reps * set.weight:set.reps*set.weight*0.45359237)
             });
             return (
               <View style={{ alignItems: "center" }}>
@@ -370,7 +373,7 @@ export default function Exercise({ navigation, route }) {
                                   <Text
                                     style={{ fontWeight: "bold", color: "red" }}
                                   >
-                                    Weight: {set.weight}
+                                    Weight: {Math.round((unit==='imperial')?set.weight:set.weight*0.45359237)} {(unit==='imperial') && ("lb")} {(unit==='metric') && ("kg")}
                                   </Text>
                                 </View>
                               );
@@ -395,7 +398,7 @@ export default function Exercise({ navigation, route }) {
             );
           }}
           keyExtractor={(item) => item.id}
-          extraData={rerender} //if set is modified, need to force this to rerender
+          extraData={[rerender, unit, theme]} //if set is modified, need to force this to rerender
         />
       )}
       {!DATA && <Text style={{top: 200, color:'grey', fontSize: 20, fontWeight: 'bold'}}>Add a set to start tracking!</Text>}

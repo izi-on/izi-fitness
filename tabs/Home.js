@@ -18,8 +18,10 @@ import {
 import uuid from "react-native-uuid";
 import { Dimensions, Keyboard } from "react-native";
 import { Button, TextInput, Card, List } from "react-native-paper";
+import { _getData } from "../custom-functions/async-functions";
 
 export default function Home({ navigation, route }) {
+  const [theme, setTheme] = useState(null)
   const [textS, setTextS] = useState("");
   const [exercises, setExercises] = useState([]); //currently for testing, this will be stored locally or on a server later
   const [rSwitch, setRSwitch] = useState(false);
@@ -100,6 +102,15 @@ export default function Home({ navigation, route }) {
     const unsub = navigation.addListener('focus', () => {
       _getExercises()
     })
+    return unsub
+  }, [navigation])
+
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      var data = _getData('settings')
+      setTheme(data.theme)
+    })
+    return unsub
   }, [navigation])
 
   //refresh also runs on start

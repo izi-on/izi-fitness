@@ -3,7 +3,9 @@ import React, { useEffect } from 'react'
 import { Chip, List, Button} from 'react-native-paper'
 import { useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { _getData, _storeData } from '../custom-functions/async-functions'
 
+//PLAN: USE CONTEXT TO GET DATA FROM SETTINGS AND USE ASYNC STORAGE SETTINGS TO INIT THE CONTEXT. MUCH FASTER!!!!
 export default function Settings() {
 
   const [unit, setUnit] = useState('imperial')
@@ -17,6 +19,7 @@ export default function Settings() {
     await AsyncStorage.clear()
   }
 
+  /*
   const _getData = async () => {
     try {
       const resRaw = await AsyncStorage.getItem('settings')
@@ -37,14 +40,21 @@ export default function Settings() {
       console.log(e)
     }
   }
+*/
 
   //get states on load
   useEffect(() => {
     var data;
     (async () => {
-      data = await _getData()
-      setUnit(data.unit)
-      setTheme(data.theme)
+      data = await _getData("settings")
+      if (data) {
+        setUnit(data.unit)
+        setTheme(data.theme)
+      } else {
+        setUnit('imperial')
+        setTheme('light')
+      }
+
     })()
     
   }, [])
@@ -52,7 +62,7 @@ export default function Settings() {
   //modify async storage on change
   useEffect(() => {
     if (change) {
-      _setData("settings")
+      _storeData("settings", {unit: unit, theme: theme})
       setChange(false)
     }
 

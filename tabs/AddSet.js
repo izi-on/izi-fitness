@@ -1,5 +1,5 @@
 import { TouchableWithoutFeedback, View, Keyboard } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TabRouter } from "@react-navigation/native";
 import uuid from "react-native-uuid";
 import {
@@ -12,9 +12,12 @@ import {
 } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { _getData } from "../custom-functions/async-functions";
 
 export default function AddSet({ navigation, route }) {
   const type = route.params.type;
+  const [theme, setTheme] = useState(null)
+  const [unit, setUnit] = useState(null)
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(
     type === "modify" ? new Date(route.params.setToModify.timeRaw) : new Date()
@@ -42,7 +45,7 @@ export default function AddSet({ navigation, route }) {
           }),
           timeRaw: time.toISOString(),
           reps: tReps,
-          weight: tWeight,
+          weight: (unit === 'imperial')?tWeight:tWeight*2.20462262185,
         },
       });
     }
@@ -57,6 +60,19 @@ export default function AddSet({ navigation, route }) {
     const currentDate = selectedDate;
     setTime(currentDate);
   };
+
+  //initial load, get unit type (metric or imperial)
+  //NOTE: IF UNIT CHANGE WHILE TEXT INPUT FIELD HAS OTHER UNIT, NOT HANDLED.
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      (async () => {
+        var data = await _getData('settings')
+        setUnit(data.unit)
+        setTheme(data.theme)
+      })()
+    })
+    return unsub
+  }, [])
 
   return (
     /*
@@ -150,14 +166,18 @@ export default function AddSet({ navigation, route }) {
             title="Weight: "
             left={() => <List.Icon icon="weight" />}
             right={() => (
-              <TextInput
-                mode='flat'
-                style={{ minWidth: 45, right: 15 }}
-                keyboardType="numeric"
-                onChangeText={setTWeight}
-                value={tWeight}
-                activeUnderlineColor="green"
-              />
+              <View style={{flexDirection: 'row'}}>
+                {unit==='imperial' && <Text style={{top: 20, fontSize: 20}}>Lb:</Text>}
+                {unit==='metric' && <Text style={{top: 20, fontSize: 20}}>kg:</Text>}
+                <TextInput
+                  mode='flat'
+                  style={{ minWidth: 45, right: 15, marginLeft: 20 }}
+                  keyboardType="numeric"
+                  onChangeText={setTWeight}
+                  value={tWeight}
+                  activeUnderlineColor="green"
+                />
+              </View>
             )}
           />
           <Divider />
