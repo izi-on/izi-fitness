@@ -153,23 +153,21 @@ export default function Home({ navigation, route }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{ alignItems: "center", flex: 1 }}>
-        <View
-          style={{
-            ...styles.container,
+        
+        <TextInput
+          mode="outlined"
+          style={{ 
+            margin: 10, 
             zIndex: 1,
-            width: Dimensions.get("window").width,
-            backgroundColor: "white",
+            width: Dimensions.get('window').width*0.9,
+            height: 50,
+            backgroundColor: 'white',
           }}
-        >
-          <TextInput
-            mode="outlined"
-            style={{ margin: 10 }}
-            label="Search exercise"
-            activeOutlineColor="blue"
-            onChangeText={setTextS}
-            value={textS}
-          />
-        </View>
+          label="Search exercise"
+          activeOutlineColor="blue"
+          onChangeText={setTextS}
+          value={textS}
+        />
         {exercises.length!==0 && (
           <FlatList
             showsVerticalScrollIndicator="false"
@@ -263,7 +261,7 @@ export default function Home({ navigation, route }) {
           */
           />
         )}
-        {exercises.length===0 && <Text style={{top: 15}}>Click ADD to get started!</Text>}
+        {exercises.length===0 && <Text style={{top: 200, color:'grey', fontSize: 20, fontWeight: 'bold'}}>Click ADD to get started!</Text>}
         <Button
           style={{
             position: "absolute",

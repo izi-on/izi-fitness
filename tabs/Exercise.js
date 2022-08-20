@@ -379,7 +379,7 @@ export default function Exercise({ navigation, route }) {
           extraData={rerender} //if set is modified, need to force this to rerender
         />
       )}
-      {!DATA && <Text style={{ top: 10 }}>Add a set to start tracking!</Text>}
+      {!DATA && <Text style={{top: 200, color:'grey', fontSize: 20, fontWeight: 'bold'}}>Add a set to start tracking!</Text>}
     </View>
   );
 }

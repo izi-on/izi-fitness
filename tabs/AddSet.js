@@ -129,7 +129,7 @@ export default function AddSet({ navigation, route }) {
                 testID="dateTimePicker"
                 value={time}
                 onChange={onChangeTime}
-              />
+                />
             )}
           />
           <Divider />
@@ -142,7 +142,7 @@ export default function AddSet({ navigation, route }) {
                 keyboardType="numeric"
                 onChangeText={setTReps}
                 value={tReps}
-                activeOutlineColor="blue"
+                activeUnderlineColor="green"
               />
             )}
           />
@@ -151,11 +151,12 @@ export default function AddSet({ navigation, route }) {
             left={() => <List.Icon icon="weight" />}
             right={() => (
               <TextInput
+                mode='flat'
                 style={{ minWidth: 45, right: 15 }}
                 keyboardType="numeric"
                 onChangeText={setTWeight}
                 value={tWeight}
-                activeOutlineColor="blue"
+                activeUnderlineColor="green"
               />
             )}
           />
@@ -165,7 +166,7 @@ export default function AddSet({ navigation, route }) {
         <Button
           title="Record set"
           onPress={handleSet}
-          color="blue"
+          color="green"
           style={{ width: 130, alignSelf: "center" }}
         >
           Submit set

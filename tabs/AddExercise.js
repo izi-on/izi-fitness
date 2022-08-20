@@ -39,12 +39,12 @@ export default function AddExercise({ navigation, route }) {
           onChangeText={setName}
           value={name}
           style={{ width: Dimensions.get("window").width * 0.85, margin: 15 }}
-          activeOutlineColor="blue"
+          activeOutlineColor="green"
           mode="outlined"
         />
         <Button
           onPress={handleSubmit}
-          color="blue"
+          color="green"
         >
           Submit exercise
         </Button>
