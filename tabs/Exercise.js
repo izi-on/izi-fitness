@@ -16,16 +16,18 @@ export default function Exercise({ navigation, route }) {
   const [DATA, SETDATA] = useState([]);
   const [rerender, triggerRerender] = useState(false);
   const [modified, setModified] = useState(false) //if the data has been modified
+  const [unit, setUnit] = useState('imperial')
+  const [theme, setTheme] = useState('light')
 
   //GET DATA FUNCTION
-  const _getData = async () => {
+  const _getData = async (key) => {
     try {
-      const jsonValue = await AsyncStorage.getItem("exercise-" + exId);
+      const jsonValue = await AsyncStorage.getItem(key);
       const res = jsonValue !== null ? JSON.parse(jsonValue) : null;
       if (res) {
-        SETDATA(res.data);
+        return res.data;
       } else {
-        SETDATA(null);
+        return null;
       } //CHECK IF NULL
     } catch (e) {
       console.log(e);
@@ -91,7 +93,19 @@ export default function Exercise({ navigation, route }) {
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
     console.log("INIT LOAD DETECTED, GET DATA");
-    _getData();
+    //load data
+    var data;
+    (async () => {
+      data = await _getData("exercise-" + exId)
+      SETDATA(data)
+    })
+    //get unit (metric or pound) and theme (light or dark)
+    (async () => {
+      data = await _getData("settings")
+      setUnit(data.unit)
+      setTheme(data.theme)
+    })
+
   }, []);
 
   //ADD DATA or MODIFY DATA
