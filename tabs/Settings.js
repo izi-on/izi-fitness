@@ -29,10 +29,10 @@ export default function Settings() {
     }
   }
 
-  const _setData = async () => {
+  const _setData = async (key) => {
     try {
       const send = JSON.stringify({data: {unit: unit, theme: theme}})
-      await AsyncStorage.setItem('settings', send)
+      await AsyncStorage.setItem(key, send)
     } catch (e) {
       console.log(e)
     }
@@ -52,7 +52,7 @@ export default function Settings() {
   //modify async storage on change
   useEffect(() => {
     if (change) {
-      _setData()
+      _setData("settings")
       setChange(false)
     }
 

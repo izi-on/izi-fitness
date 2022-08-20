@@ -6,6 +6,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
 import _ from "lodash";
+import { _getData, _storeData } from "../custom-functions/async-functions";
 
 export default function Exercise({ navigation, route }) {
   const name = route.params.name;
@@ -19,6 +20,8 @@ export default function Exercise({ navigation, route }) {
   const [unit, setUnit] = useState('imperial')
   const [theme, setTheme] = useState('light')
 
+  /*
+  
   //GET DATA FUNCTION
   const _getData = async (key) => {
     try {
@@ -35,14 +38,16 @@ export default function Exercise({ navigation, route }) {
   };
 
   //STORE DATA
-  const _storeData = async (newData) => {
+  const _storeData = async (key, newData) => {
     try {
       const jsonValue = JSON.stringify({ data: newData });
-      await AsyncStorage.setItem("exercise-" + exId, jsonValue);
+      await AsyncStorage.setItem(key, jsonValue);
     } catch (e) {
       console.log(e);
     }
   };
+
+  */
 
   //HANDLE ADDING DATA, LOGIC IS IN USE EFFECT
   const handleAdd = () => {
@@ -70,10 +75,10 @@ export default function Exercise({ navigation, route }) {
       });
       console.log("OBJECT AFTER FILTER:", newData);
       if (newData.length === 0) {
-        _storeData(null);
+        _storeData("exercise-" + exId, null);
         return null;
       } else {
-        _storeData(newData);
+        _storeData("exercise-" + exId, newData);
         return newData;
       }
     });
@@ -233,7 +238,7 @@ export default function Exercise({ navigation, route }) {
         //console.log("THE NEW DATA IS: ", newData);
 
         //store to local db
-        _storeData(newData);
+        _storeData("exercise-" + exId, newData);
 
         return newData;
       });
