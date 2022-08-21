@@ -8,7 +8,7 @@ import {
   Image,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Swipeable,
@@ -19,14 +19,17 @@ import uuid from "react-native-uuid";
 import { Dimensions, Keyboard } from "react-native";
 import { Button, TextInput, Card, List } from "react-native-paper";
 import { _getData } from "../custom-functions/async-functions";
+import { Context } from "../App";
 
 export default function Home({ navigation, route }) {
-  const [theme, setTheme] = useState(null)
   const [textS, setTextS] = useState("");
   const [exercises, setExercises] = useState([]); //currently for testing, this will be stored locally or on a server later
   const [rSwitch, setRSwitch] = useState(false);
   const [removed, setRemoved] = useState(false);
   const cardWidth = Dimensions.get("window").width * 0.8;
+  const {theme} = useContext(Context)
+
+
   //const [filtered, setFiltered] = useState([])
 
   /*
@@ -98,30 +101,22 @@ export default function Home({ navigation, route }) {
 
   //check for modified data
   useEffect(() => {
-    console.log('trigger modif in home')
-    const unsub = navigation.addListener('focus', () => {
-      _getExercises()
-    })
-    return unsub
-  }, [navigation])
-
-  useEffect(() => {
-    const unsub = navigation.addListener('focus', () => {
-      var data = _getData('settings')
-      setTheme(data.theme)
-    })
-    return unsub
-  }, [navigation])
+    console.log("trigger modif in home");
+    const unsub = navigation.addListener("focus", () => {
+      _getExercises();
+    });
+    return unsub;
+  }, [navigation]);
 
   //refresh also runs on start
   useEffect(() => {
-    console.log('trigger refresh in home')
+    console.log("trigger refresh in home");
     _getExercises();
   }, [rSwitch]);
 
   useEffect(() => {
     if (removed) {
-      console.log('trigger remove in home')
+      console.log("trigger remove in home");
       setRemoved(false);
       _addExercise(); //refresh db
       pageRefresh();
@@ -131,8 +126,8 @@ export default function Home({ navigation, route }) {
   //handle new exercise
   useEffect(() => {
     if (route.params?.exercise) {
-      const newExer = route.params.exercise
-      console.log('trigger new exercise')
+      const newExer = route.params.exercise;
+      console.log("trigger new exercise");
       const exercise = {
         name: newExer,
         id: uuid.v4(),
@@ -145,7 +140,7 @@ export default function Home({ navigation, route }) {
       _addExercise(exercise);
       pageRefresh();
       setTextS("");
-      route.params.exercise = null
+      route.params.exercise = null;
     }
   }, [route.params?.exercise]);
 
@@ -164,22 +159,21 @@ export default function Home({ navigation, route }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{ alignItems: "center", flex: 1 }}>
-        
         <TextInput
           mode="outlined"
-          style={{ 
-            margin: 10, 
+          style={{
+            margin: 10,
             zIndex: 1,
-            width: Dimensions.get('window').width*0.9,
+            width: Dimensions.get("window").width * 0.9,
             height: 50,
-            backgroundColor: 'white',
+            backgroundColor: "white",
           }}
           label="Search exercise"
           activeOutlineColor="blue"
           onChangeText={setTextS}
           value={textS}
         />
-        {exercises.length!==0 && (
+        {exercises.length !== 0 && (
           <FlatList
             showsVerticalScrollIndicator="false"
             data={exercises}
@@ -272,7 +266,18 @@ export default function Home({ navigation, route }) {
           */
           />
         )}
-        {exercises.length===0 && <Text style={{top: 200, color:'grey', fontSize: 20, fontWeight: 'bold'}}>Click ADD to get started!</Text>}
+        {exercises.length === 0 && (
+          <Text
+            style={{
+              top: 200,
+              color: "grey",
+              fontSize: 20,
+              fontWeight: "bold",
+            }}
+          >
+            Click ADD to get started!
+          </Text>
+        )}
         <Button
           style={{
             position: "absolute",
@@ -286,7 +291,6 @@ export default function Home({ navigation, route }) {
             shadowOpacity: 0.6,
             width: 100,
             height: 60,
-
           }}
           contentStyle={{ height: 60 }}
           onPress={

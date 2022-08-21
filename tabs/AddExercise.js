@@ -12,17 +12,6 @@ import { _getData } from "../custom-functions/async-functions";
 export default function AddExercise({ navigation, route }) {
   const [name, setName] = useState(null);
   const [error, setError] = useState(null)
-  const [theme, setTheme] = useState(null)
-
-  useEffect(() => {
-    const unsub = navigation.addListener('focus', () => {
-      (async () => {
-        var data = await _getData('settings')
-        setTheme(data.theme)
-      })()
-    })
-    return unsub
-  }, [])
 
   const handleSubmit = () => {
     try {

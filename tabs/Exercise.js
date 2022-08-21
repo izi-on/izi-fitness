@@ -1,5 +1,5 @@
 import { View, FlatList, Animated, StyleSheet, Dimensions } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RectButton } from "react-native-gesture-handler";
 import { Swipeable } from "react-native-gesture-handler";
@@ -7,6 +7,7 @@ import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
 import _ from "lodash";
 import { _getData, _storeData } from "../custom-functions/async-functions";
+import { Context } from "../App";
 
 export default function Exercise({ navigation, route }) {
   const name = route.params.name;
@@ -17,9 +18,7 @@ export default function Exercise({ navigation, route }) {
   const [DATA, SETDATA] = useState([]);
   const [rerender, triggerRerender] = useState(false);
   const [modified, setModified] = useState(false) //if the data has been modified
-  const [unit, setUnit] = useState('imperial')
-  const [theme, setTheme] = useState('light')
-
+  const {unit, theme} = useContext(Context)
   /*
 
   //GET DATA FUNCTION
@@ -97,21 +96,13 @@ export default function Exercise({ navigation, route }) {
 
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
-    const unsub = navigation.addListener('focus', () => {
-      console.log('focused exercise')
-      //load data
-      var data;
-      (async () => {
-        console.log('getting data')
-        data = await _getData("exercise-" + exId)
-        SETDATA(data)
-        data = await _getData("settings")
-        console.log(data)
-        setUnit(data.unit)
-        setTheme(data.theme)
-      })()
-    })
-    return unsub
+    //load data
+    var data;
+    (async () => {
+      console.log('getting data')
+      data = await _getData("exercise-" + exId)
+      SETDATA(data)
+    })()
 
   }, []);
 

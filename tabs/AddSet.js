@@ -1,5 +1,5 @@
 import { TouchableWithoutFeedback, View, Keyboard } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TabRouter } from "@react-navigation/native";
 import uuid from "react-native-uuid";
 import {
@@ -13,12 +13,12 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { _getData } from "../custom-functions/async-functions";
+import { Context } from "../App";
 
 export default function AddSet({ navigation, route }) {
   const type = route.params.type;
-  const [theme, setTheme] = useState(null)
-  const [unit, setUnit] = useState(null)
   const [date, setDate] = useState(new Date());
+  const {unit, theme} = useContext(Context)
   const [time, setTime] = useState(
     type === "modify" ? new Date(route.params.setToModify.timeRaw) : new Date()
 );
@@ -26,7 +26,7 @@ export default function AddSet({ navigation, route }) {
     type === "modify" ? route.params.setToModify.reps : null
   );
   const [tWeight, setTWeight] = useState(
-    type === "modify" ? route.params.setToModify.weight : null
+    type === "modify" ? Math.round(route.params.setToModify.weight).toString() : null
   );
 
   const handleSet = () => {
@@ -60,19 +60,6 @@ export default function AddSet({ navigation, route }) {
     const currentDate = selectedDate;
     setTime(currentDate);
   };
-
-  //initial load, get unit type (metric or imperial)
-  //NOTE: IF UNIT CHANGE WHILE TEXT INPUT FIELD HAS OTHER UNIT, NOT HANDLED.
-  useEffect(() => {
-    const unsub = navigation.addListener('focus', () => {
-      (async () => {
-        var data = await _getData('settings')
-        setUnit(data.unit)
-        setTheme(data.theme)
-      })()
-    })
-    return unsub
-  }, [])
 
   return (
     /*
