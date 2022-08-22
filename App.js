@@ -1,4 +1,4 @@
-import { Text } from "react-native-paper";
+import { Text, Button } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -21,84 +21,85 @@ Tab = createBottomTabNavigator();
 export const Context = createContext();
 
 export default function App() {
-
   //settings
-  const [unit, setUnit] = useState(null)
-  const [theme, setTheme] = useState(null)
+  const [unit, setUnit] = useState(null);
+  const [theme, setTheme] = useState(null);
 
   const [pending, setPending] = useState(true);
 
   useEffect(() => {
     (async () => {
-      initSettings = await _getData('settings')
+      initSettings = await _getData("settings");
       if (initSettings) {
-        setUnit(initSettings.unit)
-        setTheme(initSettings.theme)
-        setPending(false)
-      } 
-    })()
-  }, [])
+        setUnit(initSettings.unit);
+        setTheme(initSettings.theme);
+        setPending(false);
+      }
+    })();
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
       {pending && <Text style={{ alignSelf: "center" }}>LOADING...</Text>}
       {!pending && (
-        <Context.Provider value={{unit, setUnit, theme, setTheme}}>
+        <Context.Provider value={{ unit, setUnit, theme, setTheme }}>
           <PaperProvider theme={DefaultTheme}>
             <NavigationContainer>
               <Tab.Navigator
                 sceneContainerStyle={{ backgroundColor: "white" }}
-                screenOptions={({ route }) => 
-                {
-                  const {theme} = useContext(Context)
+                screenOptions={({ route }) => {
+                  const { theme } = useContext(Context);
 
-                  const bc = (theme==='light')?'#F0F0F0':'#111111' //background color
-                  const tc = (theme==='light')?'#111111':'#F0F0F0' //text color
+                  const bc = theme === "light" ? "#F0F0F0" : "#111111"; //background color
+                  const tc = theme === "light" ? "#111111" : "#F0F0F0"; //text color
 
                   return {
-                  tabBarIcon: ({ focused, color, size }) => {
-                    let iconName;
+                    tabBarIcon: ({ focused, color, size }) => {
+                      let iconName;
 
-                    if (route.name === "Workout") {
-                      iconName = "weight-lifter";
-                      return (
-                        <MaterialCommunityIcons
-                          name={iconName}
-                          size={size}
-                          color={color}
-                        />
-                      );
-                    } else if (route.name === "Settings") {
-                      iconName = "settings";
-                      return (
-                        <Ionicons name={iconName} size={size} color={color} />
-                      );
-                    }
+                      if (route.name === "Workout") {
+                        iconName = "weight-lifter";
+                        return (
+                          <MaterialCommunityIcons
+                            name={iconName}
+                            size={size}
+                            color={color}
+                          />
+                        );
+                      } else if (route.name === "Settings") {
+                        iconName = "settings";
+                        return (
+                          <Ionicons name={iconName} size={size} color={color} />
+                        );
+                      }
 
-                    // You can return any component that you like here!
-                  },
-                  headerStyle: {
-                    backgroundColor: 'green',
-                    elevation: 0,
-                    shadowOffset: {
-                      width: 0, height: 0 // for iOS
+                      // You can return any component that you like here!
                     },
-                  },
-                  headerTitleStyle: {
-                    color: 'white'
-                  },
-                  tabBarActiveTintColor: "green",
-                  tabBarInactiveTintColor: tc,
-                  tabBarStyle: {
-                    elevation: 0,
-                    backgroundColor: bc,
-                    borderTopColor: bc,
-                    shadowOffset: {
-                      width: 0, height: 0 // for iOS
+                    headerStyle: {
+                      backgroundColor: "green",
+                      elevation: 0,
+                      shadowOffset: {
+                        width: 0,
+                        height: 0, // for iOS
+                      },
                     },
-                  }
-                  
-                }}}
+                    headerTitleStyle: {
+                      color: "white",
+                    },
+
+                    tabBarActiveTintColor: "green",
+                    tabBarInactiveTintColor: tc,
+                    tabBarStyle: {
+                      elevation: 0,
+                      backgroundColor: bc,
+                      borderTopColor: bc,
+                      shadowOffset: {
+                        width: 0,
+                        height: 0, // for iOS
+                      },
+                    },
+                  };
+                }}
               >
                 <Tab.Screen name="Workout" component={HomeStackScreen} />
                 <Tab.Screen name="Settings" component={Settings} />

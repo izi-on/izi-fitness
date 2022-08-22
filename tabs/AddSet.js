@@ -1,4 +1,4 @@
-import { TouchableWithoutFeedback, View, Keyboard } from "react-native";
+import { TouchableWithoutFeedback, View, Keyboard, DeviceEventEmitter } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { TabRouter } from "@react-navigation/native";
 import uuid from "react-native-uuid";
@@ -64,6 +64,14 @@ export default function AddSet({ navigation, route }) {
   const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
   const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
   const tinpc = (theme==='light')?'#FFFFFF':'#000000' //text input color 
+
+  //on focus, add back button
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      DeviceEventEmitter.emit('showBackButton')
+    })
+    return unsub
+  }, [navigation])
 
   return (
     /*

@@ -3,6 +3,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
+  DeviceEventEmitter
 } from "react-native";
 import React, { useContext } from "react";
 import { useState, useEffect } from "react";
@@ -35,6 +36,14 @@ export default function AddExercise({ navigation, route }) {
 
   const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
   const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
+
+  //on focus, add back button
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      DeviceEventEmitter.emit('showBackButton')
+    })
+    return unsub
+  }, [navigation])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

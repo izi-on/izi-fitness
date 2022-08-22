@@ -7,6 +7,7 @@ import {
   Animated,
   Image,
   TouchableWithoutFeedback,
+  DeviceEventEmitter,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -99,6 +100,14 @@ export default function Home({ navigation, route }) {
   const clearAsyncStorage = async () => {
     AsyncStorage.clear();
   };
+
+  //on focus, remove back button in home screen
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      DeviceEventEmitter.emit('removeBackButton')
+    })
+    return unsub
+  }, [navigation])
 
   //check for modified data
   useEffect(() => {

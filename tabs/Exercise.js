@@ -1,4 +1,4 @@
-import { View, FlatList, Animated, StyleSheet, Dimensions } from "react-native";
+import { View, FlatList, Animated, StyleSheet, Dimensions, DeviceEventEmitter } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RectButton } from "react-native-gesture-handler";
@@ -94,8 +94,17 @@ export default function Exercise({ navigation, route }) {
     });
   };
 
+  //on focus, add back button
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      DeviceEventEmitter.emit('showBackButton')
+    })
+    return unsub
+  }, [navigation])
+
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
+    
     //load data
     var data;
     (async () => {
