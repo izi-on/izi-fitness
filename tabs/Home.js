@@ -229,10 +229,7 @@ export default function Home({ navigation, route }) {
                     >
                       <Card
                         style={{
-                          backgroundColor: cc,
-                          borderWidth: (theme==='dark')?1:0,
-                          borderRightWidth: (theme==='dark')?2:0,
-                          borderColor: invertColor(cc)
+                          backgroundColor: (theme==='dark')?'green':cc,
                         }}
                         onPress={() => {
                           navigation.navigate("Exercise", {
@@ -299,9 +296,9 @@ export default function Home({ navigation, route }) {
             right: 15,
             bottom: 15,
             justifyContent: "center",
-            shadowColor: theme==='light'?"black":'white',
+            shadowColor: 'black',
             shadowRadius: 10,
-            shadowOpacity: 0.3,
+            shadowOpacity: 0.6,
             width: 100,
             height: 60,
           }}

@@ -312,11 +312,13 @@ export default function Exercise({ navigation, route }) {
                   elevation={3}
                   style={{
                     backgroundColor: cc,
-                    shadowColor: (theme==='light'?'black':'white'),
+                    shadowColor: 'black',
                     shadowRadius: 10,
-                    shadowOpacity: 0.4,
+                    shadowOpacity: (theme==='dark')?0.7:0.3,
                     width: Dimensions.get("window").width * 0.9,
                     marginTop: 10,
+                    borderWidth: (theme==='dark')?1:0,
+                    borderColor: 'white',
                   }}
                 >
                   <Card.Title
