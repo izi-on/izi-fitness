@@ -20,6 +20,7 @@ import { Dimensions, Keyboard } from "react-native";
 import { Button, TextInput, Card, List } from "react-native-paper";
 import { _getData } from "../custom-functions/async-functions";
 import { Context } from "../App";
+import { invertColor } from "../custom-functions/color-invert";
 
 export default function Home({ navigation, route }) {
   const [textS, setTextS] = useState("");
@@ -156,9 +157,13 @@ export default function Home({ navigation, route }) {
     }, [textS, exercises])
     */
 
+  const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
+  const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
+  const cc = (theme==='light')? '#FFFFFF':'#000000'
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ alignItems: "center", flex: 1 }}>
+      <View style={{ alignItems: "center", flex: 1, backgroundColor: bc }}>
         <TextInput
           mode="outlined"
           style={{
@@ -166,12 +171,14 @@ export default function Home({ navigation, route }) {
             zIndex: 1,
             width: Dimensions.get("window").width * 0.9,
             height: 50,
-            backgroundColor: "white",
+            backgroundColor: theme==='light'?cc:bc,
           }}
-          label="Search exercise"
-          activeOutlineColor="blue"
-          onChangeText={setTextS}
+          label={<Text style={{color: tc}}>Search exercise</Text>}
+          outlineColor={tc}
+          activeOutlineColor={tc}
           value={textS}
+          theme={{ colors: { text: tc } }}
+          onChangeText={setTextS}
         />
         {exercises.length !== 0 && (
           <FlatList
@@ -221,6 +228,12 @@ export default function Home({ navigation, route }) {
                       }}
                     >
                       <Card
+                        style={{
+                          backgroundColor: cc,
+                          borderWidth: (theme==='dark')?1:0,
+                          borderRightWidth: (theme==='dark')?2:0,
+                          borderColor: invertColor(cc)
+                        }}
                         onPress={() => {
                           navigation.navigate("Exercise", {
                             name: item.name,
@@ -230,11 +243,11 @@ export default function Home({ navigation, route }) {
                         mode="contained"
                         left={() => <List.Icon icon="arrow-left" />}
                       >
-                        <Card.Title title={item.name} />
+                        <Card.Title title={<Text style={{color: tc}}>{item.name}</Text>} />
                         <Card.Content>
                           <View>
-                            <Text>Last modified:</Text>
-                            <Text>
+                            <Text style={{color: tc}}>Last modified:</Text>
+                            <Text style={{color: tc}}>
                               {item.lastModifiedDate} at {item.lastModifiedTime}
                             </Text>
                           </View>
@@ -286,9 +299,9 @@ export default function Home({ navigation, route }) {
             right: 15,
             bottom: 15,
             justifyContent: "center",
-            shadowColor: "black",
-            shadowRadius: 20,
-            shadowOpacity: 0.6,
+            shadowColor: theme==='light'?"black":'white',
+            shadowRadius: 10,
+            shadowOpacity: 0.3,
             width: 100,
             height: 60,
           }}

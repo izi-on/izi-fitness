@@ -281,8 +281,13 @@ export default function Exercise({ navigation, route }) {
 
   }, [modified])
 
+  const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
+  const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
+  const cc = (theme==='light')? '#FFFFFF':'#000000' //card color 
+
   return (
-    <View style={{ alignItems: "center", flex: 1 }}>
+    <View style={{ alignItems: "center", flex: 1, backgroundColor: bc }}>
+      <Divider style={{height: 10}}/>
       <Button
         style={{ borderRadius: 0, width: Dimensions.get("window").width }}
         color="green"
@@ -306,16 +311,20 @@ export default function Exercise({ navigation, route }) {
                   mode="elevated"
                   elevation={3}
                   style={{
+                    backgroundColor: cc,
+                    shadowColor: (theme==='light'?'black':'white'),
+                    shadowRadius: 10,
+                    shadowOpacity: 0.4,
                     width: Dimensions.get("window").width * 0.9,
                     marginTop: 10,
                   }}
                 >
                   <Card.Title
-                    title={item.date}
-                    subtitle={`Total volume: ${totalVolume}`}
-                    left={() => <List.Icon icon="dumbbell" />}
+                    title={<Text style={{color: tc, fontWeight:'bold'}}>{item.date}</Text>}
+                    subtitle={<Text style={{color: tc, fontWeight:'bold'}}>Total volume: {totalVolume}</Text>}
+                    left={() => <List.Icon icon="dumbbell" color={tc}/>}
                   />
-                  <Divider />
+                  <Divider style={{backgroundColor: tc}}/>
                   {item.sets.map((set) => (
                     <View key={set.id} styles={{ flex: 1 }}>
                       <Swipeable
@@ -347,7 +356,7 @@ export default function Exercise({ navigation, route }) {
                           );
                         }}
                       >
-                        <View style={{ backgroundColor: "white" }}>
+                        <View style={{ backgroundColor: cc}}>
                           <List.Item
                             onPress={() => modifySet(set)}
                             title={() => {
@@ -370,7 +379,7 @@ export default function Exercise({ navigation, route }) {
                               );
                             }}
                             left={() => {
-                              return <List.Icon icon="arrow-left" />;
+                              return <List.Icon icon="arrow-left" color={tc}/>;
                             }}
                             right={() => {
                               return (

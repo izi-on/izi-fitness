@@ -61,6 +61,10 @@ export default function AddSet({ navigation, route }) {
     setTime(currentDate);
   };
 
+  const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
+  const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
+  const tinpc = (theme==='light')?'#FFFFFF':'#000000' //text input color 
+
   return (
     /*
     <View>
@@ -103,19 +107,23 @@ export default function AddSet({ navigation, route }) {
       />
     </View>
     */
+
+    
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
+      <View style={{ backgroundColor: bc, flex: 1 }}>
         <List.Section>
           <List.Subheader>
-            {type==='add' && <Text>Enter set information:</Text>}
-            {type==='modify' && <Text>Modify set:</Text>}
+            {type==='add' && <Text style={{color: tc}}>Enter set information:</Text>}
+            {type==='modify' && <Text style={{color: tc}}>Modify set:</Text>}
           </List.Subheader>
           {type==='add' && <List.Item
-            title={"Date:"}
-            left={() => <List.Icon icon="calendar" />}
+            title={<Text style={{color: tc}}>Date:</Text>}
+            left={() => <List.Icon icon="calendar" color={tc}/>}
             right={() => (
               <DateTimePicker
-                style={{ top: 12, right: 15, width: 200 }}
+                themeVariant={theme}
+                textColor={tc}
+                style={{ top: 12, right: 15, width: 200, color: tc}}
                 testID="dateTimePicker"
                 value={date}
                 onChange={onChange}
@@ -123,10 +131,11 @@ export default function AddSet({ navigation, route }) {
             )}
           />}
           <List.Item
-            title={"Time:"}
-            left={() => <List.Icon icon="clock" />}
+            title={<Text style={{color: tc}}>Time:</Text>}
+            left={() => <List.Icon icon="clock" color={tc}/>}
             right={() => (
               <RNDateTimePicker
+                themeVariant={theme}
                 mode="time"
                 style={{ top: 12, right: 15, width: 200 }}
                 testID="dateTimePicker"
@@ -137,32 +146,34 @@ export default function AddSet({ navigation, route }) {
           />
           <Divider />
           <List.Item
-            title={"Reps:"}
-            left={() => <List.Icon icon="dumbbell" />}
+            title={<Text style={{color: tc}}>Reps</Text>}
+            left={() => <List.Icon icon="dumbbell" color={tc}/>}
             right={() => (
               <TextInput
-                style={{ minWidth: 45, maxWidth: 200, right: 15 }}
+                style={{ minWidth: 45, maxWidth: 200, right: 15, backgroundColor: tinpc }}
                 keyboardType="numeric"
                 onChangeText={setTReps}
                 value={tReps}
-                activeUnderlineColor="green"
+                underlineColor={tc}
+                activeUnderlineColor={tc}
               />
             )}
           />
           <List.Item
-            title="Weight: "
-            left={() => <List.Icon icon="weight" />}
+            title={<Text style={{color: tc}}>Date:</Text>}
+            left={() => <List.Icon icon="weight" color={tc}/>}
             right={() => (
               <View style={{flexDirection: 'row'}}>
-                {unit==='imperial' && <Text style={{top: 20, fontSize: 20}}>Lb:</Text>}
+                {unit==='imperial' && <Text style={{top: 20, fontSize: 20, color: tc}}>Lb:</Text>}
                 {unit==='metric' && <Text style={{top: 20, fontSize: 20}}>kg:</Text>}
                 <TextInput
                   mode='flat'
-                  style={{ minWidth: 45, right: 15, marginLeft: 20 }}
+                  style={{ minWidth: 45, right: 15, marginLeft: 20, backgroundColor: tinpc }}
                   keyboardType="numeric"
                   onChangeText={setTWeight}
                   value={tWeight}
-                  activeUnderlineColor="green"
+                  underlineColor={tc}
+                  activeUnderlineColor={tc}
                 />
               </View>
             )}
@@ -174,6 +185,7 @@ export default function AddSet({ navigation, route }) {
           title="Record set"
           onPress={handleSet}
           color="green"
+          mode={theme==='light'?'text':'contained'}
           style={{ width: 130, alignSelf: "center" }}
         >
           Submit set

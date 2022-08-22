@@ -4,14 +4,16 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { useState, useEffect } from "react";
 import { Snackbar, Text, TextInput, Button } from "react-native-paper";
 import { _getData } from "../custom-functions/async-functions";
+import { Context } from "../App";
 
 export default function AddExercise({ navigation, route }) {
   const [name, setName] = useState(null);
   const [error, setError] = useState(null)
+  const {theme} = useContext(Context)
 
   const handleSubmit = () => {
     try {
@@ -31,20 +33,30 @@ export default function AddExercise({ navigation, route }) {
     
   };
 
+  const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
+  const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+      <View style={{ backgroundColor: bc,alignItems: "center", justifyContent: "center", flex: 1 }}>
         <Text style={{color: 'red'}}> {error} </Text>
         <TextInput
-          label="Enter exercise name"
+          label={<Text style={{color: tc}}>Enter exercise name</Text>}
           onChangeText={setName}
           value={name}
-          style={{ width: Dimensions.get("window").width * 0.85, margin: 15 }}
-          activeOutlineColor="green"
+          style={{ 
+            width: Dimensions.get("window").width * 0.85, 
+            margin: 15,
+            backgroundColor: bc
+          }}
+          theme={{ colors: { text: tc } }}
+          outlineColor={tc}
+          activeOutlineColor={tc}
           mode="outlined"
         />
         <Button
           onPress={handleSubmit}
+          mode={theme==='light'?'text':'contained'}
           color="green"
         >
           Submit exercise

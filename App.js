@@ -14,6 +14,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { createContext, useContext, useEffect, useState } from "react";
 import { _getData } from "./custom-functions/async-functions.js";
+import { invertColor } from "./custom-functions/color-invert.js";
 
 Tab = createBottomTabNavigator();
 
@@ -47,7 +48,14 @@ export default function App() {
             <NavigationContainer>
               <Tab.Navigator
                 sceneContainerStyle={{ backgroundColor: "white" }}
-                screenOptions={({ route }) => ({
+                screenOptions={({ route }) => 
+                {
+                  const {theme} = useContext(Context)
+
+                  const bc = (theme==='light')?'#F0F0F0':'#111111' //background color
+                  const tc = (theme==='light')?'#111111':'#F0F0F0' //text color
+
+                  return {
                   tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
 
@@ -69,9 +77,28 @@ export default function App() {
 
                     // You can return any component that you like here!
                   },
+                  headerStyle: {
+                    backgroundColor: 'green',
+                    elevation: 0,
+                    shadowOffset: {
+                      width: 0, height: 0 // for iOS
+                    },
+                  },
+                  headerTitleStyle: {
+                    color: 'white'
+                  },
                   tabBarActiveTintColor: "green",
-                  tabBarInactiveTintColor: "gray",
-                })}
+                  tabBarInactiveTintColor: tc,
+                  tabBarStyle: {
+                    elevation: 0,
+                    backgroundColor: bc,
+                    borderTopColor: bc,
+                    shadowOffset: {
+                      width: 0, height: 0 // for iOS
+                    },
+                  }
+                  
+                }}}
               >
                 <Tab.Screen name="Workout" component={HomeStackScreen} />
                 <Tab.Screen name="Settings" component={Settings} />

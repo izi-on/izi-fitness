@@ -5,6 +5,8 @@ import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { _getData, _storeData } from "../custom-functions/async-functions";
 import { Context } from "../App";
+import { invertColor } from "../custom-functions/color-invert";
+import { invert } from "lodash";
 
 //PLAN: USE CONTEXT TO GET DATA FROM SETTINGS AND USE ASYNC STORAGE SETTINGS TO INIT THE CONTEXT. MUCH FASTER!!!!
 export default function Settings() {
@@ -69,14 +71,17 @@ export default function Settings() {
     }
   }, [change]);
 
+  const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
+  const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
+
   return (
-    <View>
+    <View style={{flex: 1, backgroundColor: bc}}>
       <List.Item
-        title="Metric unit:"
+        title={<Text style={{color: tc}}>Metric unit:</Text>}
         right={(props) => (
           <View {...props} style={{ flexDirection: "row" }}>
             <Chip
-              style={{ width: width, marginRight: 10 }}
+              style={{ width: width, marginRight: 10, color: tc}}
               selected={unit === "metric" ? true : false}
               onPress={() => {
                 setUnit('metric')
@@ -98,7 +103,7 @@ export default function Settings() {
         )}
       />
       <List.Item
-        title="Theme: "
+        title={<Text style={{color: tc}}>Theme:</Text>}
         right={(props) => (
           <View {...props} style={{ flexDirection: "row" }}>
             <Chip
