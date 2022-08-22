@@ -194,7 +194,7 @@ export default function Home({ navigation, route }) {
             showsVerticalScrollIndicator="false"
             data={exercises}
             renderItem={({ item }) => {
-              if (item.name.includes(textS)) {
+              if (item.name.toLowerCase().trim().includes(textS.toLowerCase().trim())) {
                 return (
                   <View style={{ marginTop: 5, width: cardWidth }}>
                     <Swipeable

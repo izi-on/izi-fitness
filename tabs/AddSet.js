@@ -164,6 +164,7 @@ export default function AddSet({ navigation, route }) {
                 value={tReps}
                 underlineColor={tc}
                 activeUnderlineColor={tc}
+                theme={{ colors: { text: tc } }}
               />
             )}
           />
@@ -182,6 +183,7 @@ export default function AddSet({ navigation, route }) {
                   value={tWeight}
                   underlineColor={tc}
                   activeUnderlineColor={tc}
+                  theme={{ colors: { text: tc } }}
                 />
               </View>
             )}
