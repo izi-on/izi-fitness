@@ -9,7 +9,7 @@ import React, { useContext } from "react";
 import { useState, useEffect } from "react";
 import { Snackbar, Text, TextInput, Button } from "react-native-paper";
 import { _getData } from "../custom-functions/async-functions";
-import { Context } from "../App";
+import { Context } from "../context/Context"
 
 export default function AddExercise({ navigation, route }) {
   const [name, setName] = useState(null);

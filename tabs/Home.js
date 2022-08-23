@@ -20,7 +20,7 @@ import uuid from "react-native-uuid";
 import { Dimensions, Keyboard } from "react-native";
 import { Button, TextInput, Card, List } from "react-native-paper";
 import { _getData } from "../custom-functions/async-functions";
-import { Context } from "../App";
+import { Context } from "../context/Context"
 import { invertColor } from "../custom-functions/color-invert";
 
 export default function Home({ navigation, route }) {

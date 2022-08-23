@@ -13,7 +13,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { _getData } from "../custom-functions/async-functions";
-import { Context } from "../App";
+import { Context } from "../context/Context"
 
 export default function AddSet({ navigation, route }) {
   const type = route.params.type;

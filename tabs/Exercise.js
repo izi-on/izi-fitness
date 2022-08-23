@@ -7,7 +7,7 @@ import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
 import _ from "lodash";
 import { _getData, _storeData } from "../custom-functions/async-functions";
-import { Context } from "../App";
+import { Context } from "../context/Context"
 
 export default function Exercise({ navigation, route }) {
   const name = route.params.name;

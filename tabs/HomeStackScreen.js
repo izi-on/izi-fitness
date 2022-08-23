@@ -6,7 +6,7 @@ import Exercise from './Exercise'
 import AddSet from './AddSet'
 import AddExercise from './AddExercise'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Context } from '../App'
+import { Context } from "../context/Context"
 import {DeviceEventEmitter} from "react-native"
 
 const Stack = createNativeStackNavigator();

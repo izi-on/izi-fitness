@@ -15,10 +15,9 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { createContext, useContext, useEffect, useState } from "react";
 import { _getData } from "./custom-functions/async-functions.js";
 import { invertColor } from "./custom-functions/color-invert.js";
+import { Context } from "./context/Context"
 
 Tab = createBottomTabNavigator();
-
-export const Context = createContext();
 
 export default function App() {
   //settings

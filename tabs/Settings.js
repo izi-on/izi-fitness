@@ -4,7 +4,7 @@ import { Chip, List, Button } from "react-native-paper";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { _getData, _storeData } from "../custom-functions/async-functions";
-import { Context } from "../App";
+import { Context } from "../context/Context"
 import { invertColor } from "../custom-functions/color-invert";
 import { invert } from "lodash";
 
