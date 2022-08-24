@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import {
   LineChart,
@@ -22,6 +22,12 @@ export default function Chart({ route }) {
   const graphColor1 = "#858585";
   const graphColor2 = theme === "dark" ? "#525252" : "#bfbfbf";
 
+  const styles = {
+    ChartTitle: {
+      color: theme==='dark'?'white':'black', marginTop: 15, fontWeight: 'bold', fontSize: 20
+    }
+  }
+
   return (
     <LinearGradient
       colors={bc}
@@ -30,16 +36,21 @@ export default function Chart({ route }) {
       style={{ flex: 1 }}
     >
       <View style={{alignItems: 'center'}}>
-        <Text>Bezier Line Chart</Text>
+        <Text style={styles.ChartTitle}>
+          VOLUME CHART
+        </Text>
         <LineChart
           data={route.params.data}
           width={Dimensions.get("window").width * 0.9} // from react-native
           height={220}
           chartConfig={{
+            fillShadowGradientFromOpacity: 0.3,
+            fillShadowGradientFrom: 'green',
+            fillShadowGradientToOpacity: 0,
             backgroundColor: graphColorBackground,
             backgroundGradientFrom: graphColor1,
             backgroundGradientTo: graphColor2,
-            decimalPlaces: 2, // optional, defaults to 2dp
+            decimalPlaces: 0, // optional, defaults to 2dp
             color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             style: {
               borderRadius: 16,
@@ -47,6 +58,7 @@ export default function Chart({ route }) {
           }}
           bezier
           style={{
+            marginTop: 15,
             marginVertical: 8,
             borderRadius: 16,
           }}
@@ -55,3 +67,4 @@ export default function Chart({ route }) {
     </LinearGradient>
   );
 }
+
