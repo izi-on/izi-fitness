@@ -316,9 +316,26 @@ export default function Exercise({ navigation, route }) {
     */
 
     //DATES
-    const labels = DATA.map((item) => {
-      return item.date;
-    }).reverse();
+    var labels;
+    if (DATA.length < 5) {
+
+      labels = DATA.map((item) => {
+        console.log(new Date(item.date).toString())
+        const dateString = new Date(item.date).toString().split(' ').slice(1,3).join(' ')
+        return dateString;
+      }).reverse();
+      
+    } else {
+      const startDate = new Date(DATA[0].date).toString().split(' ').slice(1,3).join(' ') 
+      const endDate = new Date(DATA.at(-1).date).toString().split(' ').slice(1,3).join(' ')
+      const middleDate = new Date(DATA.at(DATA.length/2).date).toString().split(' ').slice(1,3).join(' ')
+      labels = Array(DATA.length).fill("")
+      labels[0] = startDate
+      labels[Math.floor(DATA.length/2)] = middleDate
+      labels[DATA.length - 1] = endDate
+      labels.reverse()
+    }
+    
 
     //VOLUME DATA
     const data_volume = DATA.map((item) => {
