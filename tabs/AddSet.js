@@ -165,6 +165,7 @@ export default function AddSet({ navigation, route }) {
                 underlineColor={tc}
                 activeUnderlineColor={tc}
                 theme={{ colors: { text: tc } }}
+                maxLength={4}
               />
             )}
           />
@@ -184,6 +185,7 @@ export default function AddSet({ navigation, route }) {
                   underlineColor={tc}
                   activeUnderlineColor={tc}
                   theme={{ colors: { text: tc } }}
+                  maxLength={6}
                 />
               </View>
             )}

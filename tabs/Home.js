@@ -194,6 +194,7 @@ export default function Home({ navigation, route }) {
             value={textS}
             theme={{ colors: { text: tc } }}
             onChangeText={setTextS}
+            maxLength={55}
           />
           {exercises.length !== 0 && (
             <FlatList

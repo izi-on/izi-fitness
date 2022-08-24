@@ -61,6 +61,7 @@ export default function AddExercise({ navigation, route }) {
           theme={{ colors: { text: tc } }}
           outlineColor={tc}
           activeOutlineColor={tc}
+          maxLength={55}
           mode="outlined"
         />
         <Button
