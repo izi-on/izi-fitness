@@ -1,4 +1,11 @@
-import { View, FlatList, Animated, StyleSheet, Dimensions, DeviceEventEmitter } from "react-native";
+import {
+  View,
+  FlatList,
+  Animated,
+  StyleSheet,
+  Dimensions,
+  DeviceEventEmitter,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RectButton } from "react-native-gesture-handler";
@@ -7,7 +14,8 @@ import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
 import _ from "lodash";
 import { _getData, _storeData } from "../custom-functions/async-functions";
-import { Context } from "../context/Context"
+import { Context } from "../context/Context";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Exercise({ navigation, route }) {
   const name = route.params.name;
@@ -17,8 +25,8 @@ export default function Exercise({ navigation, route }) {
 
   const [DATA, SETDATA] = useState([]);
   const [rerender, triggerRerender] = useState(false);
-  const [modified, setModified] = useState(false) //if the data has been modified
-  const {unit, theme} = useContext(Context)
+  const [modified, setModified] = useState(false); //if the data has been modified
+  const { unit, theme } = useContext(Context);
   /*
 
   //GET DATA FUNCTION
@@ -81,7 +89,7 @@ export default function Exercise({ navigation, route }) {
         return newData;
       }
     });
-    setModified(true)
+    setModified(true);
   };
 
   //send modifying request
@@ -96,23 +104,21 @@ export default function Exercise({ navigation, route }) {
 
   //on focus, add back button
   useEffect(() => {
-    const unsub = navigation.addListener('focus', () => {
-      DeviceEventEmitter.emit('showBackButton')
-    })
-    return unsub
-  }, [navigation])
+    const unsub = navigation.addListener("focus", () => {
+      DeviceEventEmitter.emit("showBackButton");
+    });
+    return unsub;
+  }, [navigation]);
 
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
-    
     //load data
     var data;
     (async () => {
-      console.log('getting data')
-      data = await _getData("exercise-" + exId)
-      SETDATA(data)
-    })()
-
+      console.log("getting data");
+      data = await _getData("exercise-" + exId);
+      SETDATA(data);
+    })();
   }, []);
 
   //ADD DATA or MODIFY DATA
@@ -140,7 +146,7 @@ export default function Exercise({ navigation, route }) {
               ],
             },
           ];
-          setModified(true)
+          setModified(true);
         } else {
           let toInsert = true; //if its a new date
           if (returnData.type === "add") {
@@ -168,7 +174,7 @@ export default function Exercise({ navigation, route }) {
 
               return item;
             });
-            setModified(true)
+            setModified(true);
           } else if (returnData.type === "modify") {
             toInsert = false;
             newData = prevData;
@@ -184,9 +190,11 @@ export default function Exercise({ navigation, route }) {
                 return set.id === returnData.id;
               }
             );
-            
-            newData[itemToModifyIndex].sets[setToModifyIndex]
-            const oldSet = {...newData[itemToModifyIndex].sets[setToModifyIndex]}
+
+            newData[itemToModifyIndex].sets[setToModifyIndex];
+            const oldSet = {
+              ...newData[itemToModifyIndex].sets[setToModifyIndex],
+            };
             newData[itemToModifyIndex].sets[setToModifyIndex] = {
               reps: returnData.reps,
               weight: returnData.weight,
@@ -195,9 +203,14 @@ export default function Exercise({ navigation, route }) {
               timeRaw: returnData.timeRaw,
             };
 
-            //check if the content has been modified 
-            if (!_.isEqual(newData[itemToModifyIndex].sets[setToModifyIndex], oldSet)) {
-              setModified(true)
+            //check if the content has been modified
+            if (
+              !_.isEqual(
+                newData[itemToModifyIndex].sets[setToModifyIndex],
+                oldSet
+              )
+            ) {
+              setModified(true);
             }
 
             newData[itemToModifyIndex].sets.sort((a, b) => {
@@ -249,171 +262,225 @@ export default function Exercise({ navigation, route }) {
           return !rerenderP;
         });
       } //modified data not detected, need to force flatlist refresh
-      route.params.returnData = null
+      route.params.returnData = null;
     }
   }, [route.params.returnData]);
 
   const _handleModify = async () => {
     try {
-
-      //get exercise 
+      //get exercise
       const jsonValue = await AsyncStorage.getItem("exercises");
       const res = JSON.parse(jsonValue);
-      console.log('received is: ', res)
+      console.log("received is: ", res);
       //change exercise properties
-      const curExerIndex = res.data.findIndex(exercise => exercise.id === exId)
-      res.data[curExerIndex].lastModifiedDate = new Date().toLocaleDateString()
-      res.data[curExerIndex].lastModifiedTime = new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-      console.log('new res is: ', res)
+      const curExerIndex = res.data.findIndex(
+        (exercise) => exercise.id === exId
+      );
+      res.data[curExerIndex].lastModifiedDate = new Date().toLocaleDateString();
+      res.data[curExerIndex].lastModifiedTime = new Date().toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      );
+      console.log("new res is: ", res);
       //save exercise
-      console.log('sending back...')
-      const jsonSend = JSON.stringify(res)
-      await AsyncStorage.setItem("exercises", jsonSend)
-      console.log('sent')
-      
+      console.log("sending back...");
+      const jsonSend = JSON.stringify(res);
+      await AsyncStorage.setItem("exercises", jsonSend);
+      console.log("sent");
     } catch (e) {
       console.log(e);
     }
-  }
+  };
 
   //set last modified date
   useEffect(() => {
     if (modified) {
-      console.log('TRIGGER LAST MODIFIED')
+      console.log("TRIGGER LAST MODIFIED");
       //set last modified label
-      _handleModify()      
+      _handleModify();
     }
-    setModified(false)
+    setModified(false);
+  }, [modified]);
 
-  }, [modified])
-
-  const bc = (theme==='light')?'#E0E0E0':'#4F4F4F' //background color
-  const tc = (theme==='light')?'#4F4F4F':'#E0F0F0' //text color
-  const cc = (theme==='light')? '#FFFFFF':'#000000' //card color 
+  const bc = theme === "dark" ? ["#383838", "#565656"] : ["#BFBFBF", "#D6D6D6"]; //background color
+  const tc = theme === "light" ? "#4F4F4F" : "#E0F0F0"; //text color
+  const cc = theme === "dark" ? ["#494949", "#202020"] : ["#FAFAFA", "#D0D0D0"]; //card colors
 
   return (
-    <View style={{ alignItems: "center", flex: 1, backgroundColor: bc }}>
-      <Divider style={{height: 10}}/>
-      <Button
-        style={{ borderRadius: 0, width: Dimensions.get("window").width }}
-        color="green"
-        onPress={handleAdd}
-        mode="contained"
-      >
-        Add set
-      </Button>
-      {DATA && (
-        <FlatList
-          style={{ width: Dimensions.get("window").width }}
-          data={DATA}
-          renderItem={({ item }) => {
-            let totalVolume = 0;
-            item.sets.forEach((set) => {
-              totalVolume += Math.round((unit==='imperial')?set.reps * set.weight:set.reps*set.weight*0.45359237)
-            });
-            return (
-              <View style={{ alignItems: "center" }}>
-                <Card
-                  mode="elevated"
-                  elevation={3}
-                  style={{
-                    backgroundColor: cc,
-                    shadowColor: 'black',
-                    shadowRadius: 10,
-                    shadowOpacity: (theme==='dark')?0.7:0.3,
-                    width: Dimensions.get("window").width * 0.9,
-                    marginTop: 10,
-                    borderWidth: (theme==='dark')?1:0,
-                    borderColor: 'white',
-                  }}
-                >
-                  <Card.Title
-                    title={<Text style={{color: tc, fontWeight:'bold'}}>{item.date}</Text>}
-                    subtitle={<Text style={{color: tc, fontWeight:'bold'}}>Total volume: {totalVolume}</Text>}
-                    left={() => <List.Icon icon="dumbbell" color={tc}/>}
-                  />
-                  <Divider style={{backgroundColor: tc}}/>
-                  {item.sets.map((set) => (
-                    <View key={set.id} styles={{ flex: 1 }}>
-                      <Swipeable
-                        renderRightActions={(progress, dragX) => {
-                          const trans = dragX.interpolate({
-                            inputRange: [0, 50, 100, 101],
-                            outputRange: [-20, 0, 0, 1],
-                          });
-                          return (
-                            <Animated.View
-                              style={{
-                                flex: 1,
-                                transform: [{ translateX: 0 }],
-                              }}
-                            >
-                              <RectButton
-                                style={[
-                                  styles.rightAction,
-                                  {
-                                    backgroundColor: "red",
-                                    elevation: 3,
-                                  },
-                                ]}
-                                onPress={() => removeData(item.id, set.id)}
-                              >
-                                <Text style={styles.actionText}>Delete</Text>
-                              </RectButton>
-                            </Animated.View>
-                          );
-                        }}
-                      >
-                        <View style={{ backgroundColor: cc}}>
-                          <List.Item
-                            onPress={() => modifySet(set)}
-                            title={() => {
+    <LinearGradient
+      colors={bc}
+      start={{ x: 0, y: 0.5 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <View style={{ alignItems: "center", flex: 1, backgroundColor: bc }}>
+        <Divider style={{ height: 10 }} />
+        <Button
+          style={{ borderRadius: 0, width: Dimensions.get("window").width }}
+          color="green"
+          onPress={handleAdd}
+          mode="contained"
+        >
+          Add set
+        </Button>
+        {DATA && (
+          <FlatList
+            style={{ width: Dimensions.get("window").width }}
+            data={DATA}
+            renderItem={({ item }) => {
+              let totalVolume = 0;
+              item.sets.forEach((set) => {
+                totalVolume += Math.round(
+                  unit === "imperial"
+                    ? set.reps * set.weight
+                    : set.reps * set.weight * 0.45359237
+                );
+              });
+              return (
+                <View style={{ alignItems: "center" }}>
+                  <Card
+                    mode="elevated"
+                    elevation={3}
+                    style={{
+                      backgroundColor: cc,
+                      shadowColor: "black",
+                      shadowRadius: 10,
+                      shadowOpacity: theme === "dark" ? 0.7 : 0.3,
+                      width: Dimensions.get("window").width * 0.9,
+                      marginTop: 10,
+                      borderWidth: theme === "dark" ? 1 : 0,
+                      borderColor: "white",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={cc}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    >
+                      <Card.Title
+                        title={
+                          <Text style={{ color: tc, fontWeight: "bold" }}>
+                            {item.date}
+                          </Text>
+                        }
+                        subtitle={
+                          <Text style={{ color: tc, fontWeight: "bold" }}>
+                            Total volume: {totalVolume}
+                          </Text>
+                        }
+                        left={() => <List.Icon icon="dumbbell" color={tc} />}
+                      />
+                      <Divider style={{ backgroundColor: tc }} />
+                      {item.sets.map((set) => (
+                        <View key={set.id} styles={{ flex: 1 }}>
+                          <Swipeable
+                            renderRightActions={(progress, dragX) => {
+                              const trans = dragX.interpolate({
+                                inputRange: [0, 50, 100, 101],
+                                outputRange: [-20, 0, 0, 1],
+                              });
                               return (
-                                <View>
-                                  <Text
-                                    style={{
-                                      fontWeight: "bold",
-                                      color: "#FFA100",
-                                    }}
+                                <Animated.View
+                                  style={{
+                                    flex: 1,
+                                    transform: [{ translateX: 0 }],
+                                  }}
+                                >
+                                  <RectButton
+                                    style={[
+                                      styles.rightAction,
+                                      {
+                                        backgroundColor: "red",
+                                        elevation: 3,
+                                      },
+                                    ]}
+                                    onPress={() => removeData(item.id, set.id)}
                                   >
-                                    Reps: {set.reps}
-                                  </Text>
-                                  <Text
-                                    style={{ fontWeight: "bold", color: "red" }}
-                                  >
-                                    Weight: {Math.round((unit==='imperial')?set.weight:set.weight*0.45359237)} {(unit==='imperial') && ("lb")} {(unit==='metric') && ("kg")}
-                                  </Text>
-                                </View>
+                                    <Text style={styles.actionText}>
+                                      Delete
+                                    </Text>
+                                  </RectButton>
+                                </Animated.View>
                               );
                             }}
-                            left={() => {
-                              return <List.Icon icon="arrow-left" color={tc}/>;
-                            }}
-                            right={() => {
-                              return (
-                                <Text style={{ top: 20, right: 20 }}>
-                                  {set.time}
-                                </Text>
-                              );
-                            }}
-                          />
+                          >
+                            <View style={{ backgroundColor: cc }}>
+                              <List.Item
+                                onPress={() => modifySet(set)}
+                                title={() => {
+                                  return (
+                                    <View>
+                                      <Text
+                                        style={{
+                                          fontWeight: "bold",
+                                          color: "#FFA100",
+                                        }}
+                                      >
+                                        Reps: {set.reps}
+                                      </Text>
+                                      <Text
+                                        style={{
+                                          fontWeight: "bold",
+                                          color: "red",
+                                        }}
+                                      >
+                                        Weight:{" "}
+                                        {Math.round(
+                                          unit === "imperial"
+                                            ? set.weight
+                                            : set.weight * 0.45359237
+                                        )}{" "}
+                                        {unit === "imperial" && "lb"}{" "}
+                                        {unit === "metric" && "kg"}
+                                      </Text>
+                                    </View>
+                                  );
+                                }}
+                                left={() => {
+                                  return (
+                                    <List.Icon icon="arrow-left" color={tc} />
+                                  );
+                                }}
+                                right={() => {
+                                  return (
+                                    <Text
+                                      style={{ top: 20, right: 20, color: tc }}
+                                    >
+                                      {set.time}
+                                    </Text>
+                                  );
+                                }}
+                              />
+                            </View>
+                          </Swipeable>
                         </View>
-                      </Swipeable>
-                    </View>
-                  ))}
-                </Card>
-              </View>
-            );
-          }}
-          keyExtractor={(item) => item.id}
-          extraData={[rerender, unit, theme]} //if set is modified, need to force this to rerender
-        />
-      )}
-      {!DATA && <Text style={{top: 200, color:'grey', fontSize: 20, fontWeight: 'bold'}}>Add a set to start tracking!</Text>}
-    </View>
+                      ))}
+                    </LinearGradient>
+                  </Card>
+                </View>
+              );
+            }}
+            keyExtractor={(item) => item.id}
+            extraData={[rerender, unit, theme]} //if set is modified, need to force this to rerender
+          />
+        )}
+        {!DATA && (
+          <Text
+            style={{
+              top: 200,
+              color: "grey",
+              fontSize: 20,
+              fontWeight: "bold",
+            }}
+          >
+            Add a set to start tracking!
+          </Text>
+        )}
+      </View>
+    </LinearGradient>
   );
 }
 
