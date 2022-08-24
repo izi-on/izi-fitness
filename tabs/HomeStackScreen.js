@@ -8,6 +8,8 @@ import AddExercise from './AddExercise'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Context } from "../context/Context"
 import {DeviceEventEmitter} from "react-native"
+import Chart from "./Chart.js"
+
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +51,8 @@ export default function HomeStackScreen({navigation, route}) {
         <Stack.Screen name="Exercise" component={Exercise} options={{ unmountOnBlur: true, headerShown: false}}/>
         <Stack.Screen name="Add set" component={AddSet} options={{ unmountOnBlur: true, headerShown: false }}/>
         <Stack.Screen name="Add exercise" component={AddExercise} options={{ unmountOnBlur: true, headerShown: false }}/>
+        <Stack.Screen name="Chart" component={Chart} options={{ unmountOnBlur: true, headerShown: false }}/>
+
     </Stack.Navigator>
   )
 }

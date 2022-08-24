@@ -7,15 +7,18 @@ import {
   Provider as PaperProvider,
   MD3LightTheme as DefaultTheme,
 } from "react-native-paper";
-//tabs import
-import HomeStackScreen from "./tabs/HomeStackScreen.js";
-import Settings from "./tabs/Settings";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { createContext, useContext, useEffect, useState } from "react";
 import { _getData } from "./custom-functions/async-functions.js";
 import { invertColor } from "./custom-functions/color-invert.js";
 import { Context } from "./context/Context"
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+
+//tabs import
+import HomeStackScreen from "./tabs/HomeStackScreen.js";
+import Settings from "./tabs/Settings";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 
 Tab = createBottomTabNavigator();
 
@@ -23,7 +26,6 @@ export default function App() {
   //settings
   const [unit, setUnit] = useState(null);
   const [theme, setTheme] = useState(null);
-
   const [pending, setPending] = useState(true);
 
   useEffect(() => {

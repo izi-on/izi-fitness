@@ -295,6 +295,53 @@ export default function Exercise({ navigation, route }) {
     }
   };
 
+  //handle navigating to Graph component with proper data
+  const handleAnalytics = () => {
+    /*
+    data={{
+      labels: ["January", "February", "March", "April", "May", "June"],
+      datasets: [
+        {
+          data: [
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+          ],
+        },
+      ],
+    }}
+    */
+
+    //DATES
+    const labels = DATA.map((item) => {
+      return item.date;
+    }).reverse();
+
+    //VOLUME DATA
+    const data_volume = DATA.map((item) => {
+      var volume = 0;
+      item.sets.forEach((set) => {
+        volume += set.reps * set.weight;
+      });
+      return volume;
+    }).reverse();
+
+    //NAVIGATE TO CHART COMPONENT AND PASS DATA
+    navigation.navigate("Chart", {
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            data: data_volume,
+          },
+        ],
+      },
+    });
+  };
+
   //set last modified date
   useEffect(() => {
     if (modified) {
@@ -316,16 +363,34 @@ export default function Exercise({ navigation, route }) {
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}
     >
-      <View style={{ alignItems: "center", flex: 1, backgroundColor: bc }}>
-        <Divider style={{ height: 10 }} />
-        <Button
-          style={{ borderRadius: 0, width: Dimensions.get("window").width }}
-          color="green"
-          onPress={handleAdd}
-          mode="contained"
-        >
-          Add set
-        </Button>
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <View style={{ flexDirection: "row" }}>
+          <Button
+            style={{
+              borderRadius: 0,
+              width: Dimensions.get("window").width * 0.45,
+              marginTop: 10,
+            }}
+            color="orange"
+            onPress={handleAnalytics}
+            mode="contained"
+          >
+            Analytics
+          </Button>
+
+          <Button
+            style={{
+              marginTop: 10,
+              borderRadius: 0,
+              width: Dimensions.get("window").width * 0.45,
+            }}
+            color="green"
+            onPress={handleAdd}
+            mode="contained"
+          >
+            Add set
+          </Button>
+        </View>
         {DATA && (
           <FlatList
             style={{ width: Dimensions.get("window").width }}
@@ -407,7 +472,7 @@ export default function Exercise({ navigation, route }) {
                               );
                             }}
                           >
-                            <View style={{ backgroundColor: cc }}>
+                            <View style={{ backgroundColor: theme==='dark'?'#4d4d4d':'#ededed'}}>
                               <List.Item
                                 onPress={() => modifySet(set)}
                                 title={() => {
