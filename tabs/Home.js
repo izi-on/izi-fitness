@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   DeviceEventEmitter,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Swipeable,
@@ -31,6 +31,7 @@ export default function Home({ navigation, route }) {
   const [removed, setRemoved] = useState(false);
   const cardWidth = Dimensions.get("window").width * 0.8;
   const { theme } = useContext(Context);
+  let animatedValue = useRef(new Animated.Value(0)).current;
 
   //const [filtered, setFiltered] = useState([])
 
@@ -154,6 +155,16 @@ export default function Home({ navigation, route }) {
     }
   }, [route.params?.exercise]);
 
+  //fade in animation
+  useEffect(() => {
+    console.log("refresh");
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   /*
     useEffect(() => {
       if (textS.trim() !== '') {
@@ -196,33 +207,34 @@ export default function Home({ navigation, route }) {
             onChangeText={setTextS}
             maxLength={55}
           />
-          {exercises.length !== 0 && (
-            <FlatList
-              showsVerticalScrollIndicator="false"
-              data={exercises}
-              renderItem={({ item }) => {
-                if (
-                  item.name
-                    .toLowerCase()
-                    .trim()
-                    .includes(textS.toLowerCase().trim())
-                ) {
-                  return (
-                    <View style={{ marginTop: 5, width: cardWidth }}>
-                      <Swipeable
-                        renderRightActions={(progress, dragX) => {
-                          const trans = dragX.interpolate({
-                            inputRange: [0, 50, 100, 101],
-                            outputRange: [-20, 0, 0, 1],
-                          });
-                          return (
-                            <Animated.View
-                              style={{
-                                flex: 1,
-                                transform: [{ translateX: 0 }],
-                              }}
-                            >
-                              {/*
+          <Animated.View style={{ opacity: animatedValue }}>
+            {exercises.length !== 0 && (
+              <FlatList
+                showsVerticalScrollIndicator="false"
+                data={exercises}
+                renderItem={({ item }) => {
+                  if (
+                    item.name
+                      .toLowerCase()
+                      .trim()
+                      .includes(textS.toLowerCase().trim())
+                  ) {
+                    return (
+                      <View style={{ marginTop: 5, width: cardWidth }}>
+                        <Swipeable
+                          renderRightActions={(progress, dragX) => {
+                            const trans = dragX.interpolate({
+                              inputRange: [0, 50, 100, 101],
+                              outputRange: [-20, 0, 0, 1],
+                            });
+                            return (
+                              <Animated.View
+                                style={{
+                                  flex: 1,
+                                  transform: [{ translateX: 0 }],
+                                }}
+                              >
+                                {/*
                             <RectButton
                               style={[styles.rightAction, { 
                                 backgroundColor: 'red',
@@ -235,70 +247,74 @@ export default function Home({ navigation, route }) {
                               onPress={() => removeExercise(item.id)}>
                               <Text style={styles.actionText}>Delete</Text>
                             </RectButton> */}
-                              <Button
-                                style={[
-                                  styles.rightAction,
-                                  {
-                                    backgroundColor: "red",
-                                  },
-                                ]}
-                                contentStyle={{ width: cardWidth, height: 200 }}
-                                onPress={() => removeExercise(item.id)}
-                              >
-                                <Text style={styles.actionText}>Delete</Text>
-                              </Button>
-                            </Animated.View>
-                          );
-                        }}
-                      >
-                        <LinearGradient
-                        colors={cc}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={{ flex: 1 }}>
-                          <Card
-                            style={{
-                              backgroundColor: 'rgba(52, 52, 52, 0)',
-                            }}
-                            onPress={() => {
-                              navigation.navigate("Exercise", {
-                                name: item.name,
-                                id: item.id,
-                              });
-                            }}
-                            mode="contained"
-                            left={() => <List.Icon icon="arrow-left" />}
+                                <Button
+                                  style={[
+                                    styles.rightAction,
+                                    {
+                                      backgroundColor: "red",
+                                    },
+                                  ]}
+                                  contentStyle={{
+                                    width: cardWidth,
+                                    height: 200,
+                                  }}
+                                  onPress={() => removeExercise(item.id)}
+                                >
+                                  <Text style={styles.actionText}>Delete</Text>
+                                </Button>
+                              </Animated.View>
+                            );
+                          }}
+                        >
+                          <LinearGradient
+                            colors={cc}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={{ flex: 1 }}
                           >
-                            <Card.Title
-                              title={
-                                <Text style={{ color: tc }}>{item.name}</Text>
-                              }
-                            />
-                            <Card.Content>
-                              <View>
-                                <Text style={{ color: tc }}>
-                                  Last modified:
-                                </Text>
-                                <Text style={{ color: tc }}>
-                                  {item.lastModifiedDate} at{" "}
-                                  {item.lastModifiedTime}
-                                </Text>
-                              </View>
-                            </Card.Content>
-                            <Card.Actions>
-                              <Button></Button>
-                            </Card.Actions>
-                          </Card>
-                        </LinearGradient>
-                      </Swipeable>
-                    </View>
-                  );
-                } else {
-                  return;
-                }
-              }}
-              keyExtractor={(item) => item.id}
-              /*
+                            <Card
+                              style={{
+                                backgroundColor: "rgba(52, 52, 52, 0)",
+                              }}
+                              onPress={() => {
+                                navigation.navigate("Exercise", {
+                                  name: item.name,
+                                  id: item.id,
+                                });
+                              }}
+                              mode="contained"
+                              left={() => <List.Icon icon="arrow-left" />}
+                            >
+                              <Card.Title
+                                title={
+                                  <Text style={{ color: tc }}>{item.name}</Text>
+                                }
+                              />
+                              <Card.Content>
+                                <View>
+                                  <Text style={{ color: tc }}>
+                                    Last modified:
+                                  </Text>
+                                  <Text style={{ color: tc }}>
+                                    {item.lastModifiedDate} at{" "}
+                                    {item.lastModifiedTime}
+                                  </Text>
+                                </View>
+                              </Card.Content>
+                              <Card.Actions>
+                                <Button></Button>
+                              </Card.Actions>
+                            </Card>
+                          </LinearGradient>
+                        </Swipeable>
+                      </View>
+                    );
+                  } else {
+                    return;
+                  }
+                }}
+                keyExtractor={(item) => item.id}
+                /*
           ItemSeparatorComponent={()=>(
             <View
             style={{alignItems:'center'}}
@@ -311,20 +327,21 @@ export default function Home({ navigation, route }) {
             </View>
           )}
           */
-            />
-          )}
-          {exercises.length === 0 && (
-            <Text
-              style={{
-                top: 200,
-                color: "grey",
-                fontSize: 20,
-                fontWeight: "bold",
-              }}
-            >
-              Click ADD to get started!
-            </Text>
-          )}
+              />
+            )}
+            {exercises.length === 0 && (
+              <Text
+                style={{
+                  top: 200,
+                  color: "grey",
+                  fontSize: 20,
+                  fontWeight: "bold",
+                }}
+              >
+                Click ADD to get started!
+              </Text>
+            )}
+          </Animated.View>
           <Button
             style={{
               position: "absolute",

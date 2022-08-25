@@ -1,6 +1,7 @@
+
 import { Text, Button } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -12,12 +13,11 @@ import { _getData } from "./custom-functions/async-functions.js";
 import { invertColor } from "./custom-functions/color-invert.js";
 import { Context } from "./context/Context"
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 //tabs import
 import HomeStackScreen from "./tabs/HomeStackScreen.js";
 import Settings from "./tabs/Settings";
-import Ionicons from "react-native-vector-icons/Ionicons";
 
 
 Tab = createBottomTabNavigator();
