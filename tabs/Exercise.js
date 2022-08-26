@@ -433,7 +433,6 @@ export default function Exercise({ navigation, route }) {
                       shadowOpacity: theme === "dark" ? 0.7 : 0.3,
                       width: Dimensions.get("window").width * 0.9,
                       marginTop: 10,
-                      borderWidth: theme === "dark" ? 1 : 0,
                       borderColor: "white",
                     }}
                   >

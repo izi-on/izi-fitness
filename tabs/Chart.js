@@ -22,6 +22,7 @@ export default function Chart({ route }) {
   const graphColor2 = theme === "dark" ? "#525252" : "#bfbfbf";
 
   const animatedValue = useRef(new Animated.Value(0)).current;
+  const opacityValue = useRef(new Animated.Value(0)).current;
 
   const styles = {
     ChartTitle: {
@@ -40,6 +41,11 @@ export default function Chart({ route }) {
       useNativeDriver: true,
       easing: Easing.out(Easing.exp)
     }).start();
+    Animated.timing(opacityValue, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true
+    }).start()
   }, []);
 
   return (
@@ -51,7 +57,7 @@ export default function Chart({ route }) {
     >
       <View style={{ alignItems: "center", flex: 1 }}>
         <Animated.View style={{
-          opacity: animatedValue,
+          opacity: opacityValue,
           transform: [{
             translateY: animatedValue.interpolate({
             inputRange: [0,1],
