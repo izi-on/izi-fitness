@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, Easing } from "react-native";
+import React, { useEffect, useRef } from "react";
 import {
   LineChart,
   BarChart,
@@ -11,6 +11,7 @@ import { Dimensions } from "react-native";
 import { Context } from "../context/Context";
 import { useContext } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { Animated } from "react-native";
 
 export default function Chart({ route }) {
   const { theme } = useContext(Context);
@@ -20,14 +21,7 @@ export default function Chart({ route }) {
   const graphColor1 = "#858585";
   const graphColor2 = theme === "dark" ? "#525252" : "#bfbfbf";
 
-  const offset = useSharedValue(0);
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: offset.value * 255 }],
-    };
-  });
-
+  const animatedValue = useRef(new Animated.Value(0)).current;
 
   const styles = {
     ChartTitle: {
@@ -38,6 +32,16 @@ export default function Chart({ route }) {
     },
   };
 
+  useEffect(() => {
+    console.log('trigger animation')
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.exp)
+    }).start();
+  }, []);
+
   return (
     <LinearGradient
       colors={bc}
@@ -45,7 +49,15 @@ export default function Chart({ route }) {
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}
     >
-        <View style={{ alignItems: "center" }}>
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <Animated.View style={{
+          opacity: animatedValue,
+          transform: [{
+            translateY: animatedValue.interpolate({
+            inputRange: [0,1],
+            outputRange: [Dimensions.get('window').height, 0]
+          })}]
+        }}>
           <Text style={styles.ChartTitle}>VOLUME CHART</Text>
           <LineChart
             data={route.params.data}
@@ -71,7 +83,8 @@ export default function Chart({ route }) {
               borderRadius: 16,
             }}
           />
-        </View>
+        </Animated.View>
+      </View>
     </LinearGradient>
   );
 }

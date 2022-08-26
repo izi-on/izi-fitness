@@ -324,7 +324,7 @@ export default function Exercise({ navigation, route }) {
         const dateString = new Date(item.date).toString().split(' ').slice(1,3).join(' ')
         return dateString;
       }).reverse();
-      
+
     } else {
       const startDate = new Date(DATA[0].date).toString().split(' ').slice(1,3).join(' ') 
       const endDate = new Date(DATA.at(-1).date).toString().split(' ').slice(1,3).join(' ')
@@ -471,7 +471,7 @@ export default function Exercise({ navigation, route }) {
                                     transform: [{ translateX: 0 }],
                                   }}
                                 >
-                                  <RectButton
+                                  <Button
                                     style={[
                                       styles.rightAction,
                                       {
@@ -484,7 +484,7 @@ export default function Exercise({ navigation, route }) {
                                     <Text style={styles.actionText}>
                                       Delete
                                     </Text>
-                                  </RectButton>
+                                  </Button>
                                 </Animated.View>
                               );
                             }}
