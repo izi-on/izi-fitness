@@ -175,7 +175,7 @@ export default function AddSet({ navigation, route }) {
             right={() => (
               <View style={{flexDirection: 'row'}}>
                 {unit==='imperial' && <Text style={{top: 20, fontSize: 20, color: tc}}>Lb:</Text>}
-                {unit==='metric' && <Text style={{top: 20, fontSize: 20}}>kg:</Text>}
+                {unit==='metric' && <Text style={{top: 20, fontSize: 20, color: tc}}>kg:</Text>}
                 <TextInput
                   mode='flat'
                   style={{ minWidth: 45, right: 15, marginLeft: 20, backgroundColor: tinpc }}

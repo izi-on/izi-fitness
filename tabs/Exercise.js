@@ -23,6 +23,7 @@ export default function Exercise({ navigation, route }) {
   const exId = route.params.id;
 
   //console.log("THE NAME IS", name);
+  const cardWidth = Dimensions.get("window").width * 0.9;
 
   const [DATA, SETDATA] = useState([]);
   const [rerender, triggerRerender] = useState(false);
@@ -135,8 +136,8 @@ export default function Exercise({ navigation, route }) {
       console.log("getting data");
       data = await _getData("exercise-" + exId);
       SETDATA(data);
-      opacityTimer.start()
-      moveXValueTimer.start()
+      opacityTimer.start();
+      moveXValueTimer.start();
     })();
   }, []);
 
@@ -476,7 +477,7 @@ export default function Exercise({ navigation, route }) {
                         shadowColor: "black",
                         shadowRadius: 10,
                         shadowOpacity: theme === "dark" ? 0.7 : 0.3,
-                        width: Dimensions.get("window").width * 0.9,
+                        width: cardWidth,
                         marginTop: 10,
                         borderColor: "white",
                       }}
@@ -523,6 +524,10 @@ export default function Exercise({ navigation, route }) {
                                           elevation: 3,
                                         },
                                       ]}
+                                      contentStyle={{
+                                        width: cardWidth,
+                                        flex: 1,
+                                      }}
                                       onPress={() =>
                                         removeData(item.id, set.id)
                                       }
