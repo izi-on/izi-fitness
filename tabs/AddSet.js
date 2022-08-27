@@ -26,7 +26,7 @@ export default function AddSet({ navigation, route }) {
     type === "modify" ? route.params.setToModify.reps : null
   );
   const [tWeight, setTWeight] = useState(
-    type === "modify" ? Math.round(route.params.setToModify.weight).toString() : null
+    type === "modify" ? Math.round((unit==='imperial')?route.params.setToModify.weight:route.params.setToModify.weight*0.453592).toString() : null
   );
 
   const handleSet = () => {

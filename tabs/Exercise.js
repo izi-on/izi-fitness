@@ -130,6 +130,7 @@ export default function Exercise({ navigation, route }) {
 
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
+    console.log('trigger initial load')
     //load data
     var data;
     (async () => {
@@ -143,6 +144,7 @@ export default function Exercise({ navigation, route }) {
 
   //ADD DATA or MODIFY DATA
   useEffect(() => {
+    console.log('trigger ADD or MODIFY')
     const returnData = route.params.returnData;
 
     if (returnData) {
@@ -291,7 +293,7 @@ export default function Exercise({ navigation, route }) {
       //get exercise
       const jsonValue = await AsyncStorage.getItem("exercises");
       const res = JSON.parse(jsonValue);
-      console.log("received is: ", res);
+      //console.log("received is: ", res);
       //change exercise properties
       const curExerIndex = res.data.findIndex(
         (exercise) => exercise.id === exId
@@ -304,7 +306,7 @@ export default function Exercise({ navigation, route }) {
           minute: "2-digit",
         }
       );
-      console.log("new res is: ", res);
+      //console.log("new res is: ", res);
       //save exercise
       console.log("sending back...");
       const jsonSend = JSON.stringify(res);
@@ -394,6 +396,7 @@ export default function Exercise({ navigation, route }) {
 
   //set last modified date
   useEffect(() => {
+    console.log('trigger modified date')
     if (modified) {
       console.log("TRIGGER LAST MODIFIED");
       //set last modified label
