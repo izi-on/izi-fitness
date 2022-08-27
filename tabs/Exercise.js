@@ -130,7 +130,7 @@ export default function Exercise({ navigation, route }) {
 
   //ON INITIAL LOAD, GET DATA
   useEffect(() => {
-    console.log('trigger initial load')
+    console.log("trigger initial load");
     //load data
     var data;
     (async () => {
@@ -144,10 +144,10 @@ export default function Exercise({ navigation, route }) {
 
   //ADD DATA or MODIFY DATA
   useEffect(() => {
-    console.log('trigger ADD or MODIFY')
     const returnData = route.params.returnData;
 
     if (returnData) {
+      console.log("trigger ADD or MODIFY");
       var newData;
       SETDATA((prevData) => {
         //console.log("THE PREVIOUS DATA WAS: ", prevData);
@@ -274,17 +274,14 @@ export default function Exercise({ navigation, route }) {
 
         //console.log("THE NEW DATA IS: ", newData);
 
-        //store to local db
-        _storeData("exercise-" + exId, newData);
-
         return newData;
       });
-      if (returnData.type === "modify") {
-        triggerRerender((rerenderP) => {
-          return !rerenderP;
-        });
-      } //modified data not detected, need to force flatlist refresh
       route.params.returnData = null;
+      //store to local db
+      _storeData("exercise-" + exId, newData);
+      if (returnData.type === "modify") {
+        triggerRerender((r) => !r);
+      } //modified data not detected, need to force flatlist refresh
     }
   }, [route.params.returnData]);
 
@@ -396,7 +393,7 @@ export default function Exercise({ navigation, route }) {
 
   //set last modified date
   useEffect(() => {
-    console.log('trigger modified date')
+    console.log("trigger modified date");
     if (modified) {
       console.log("TRIGGER LAST MODIFIED");
       //set last modified label
@@ -612,6 +609,7 @@ export default function Exercise({ navigation, route }) {
               extraData={[rerender, unit, theme]} //if set is modified, need to force this to rerender
             />
           )}
+          <View style={{ height: 45}}></View>
         </Animated.View>
         {!DATA && (
           <Text

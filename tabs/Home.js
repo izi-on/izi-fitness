@@ -314,19 +314,6 @@ export default function Home({ navigation, route }) {
                   }
                 }}
                 keyExtractor={(item) => item.id}
-                /*
-          ItemSeparatorComponent={()=>(
-            <View
-            style={{alignItems:'center'}}
-            >
-            <View style={{
-              height: 1,
-              width: "60%",
-              backgroundColor: "#607D8B",
-            }}></View>
-            </View>
-          )}
-          */
               />
             )}
             {exercises.length === 0 && (
@@ -341,6 +328,7 @@ export default function Home({ navigation, route }) {
                 Click ADD to get started!
               </Text>
             )}
+            <View style={{ height: 80, width: 10 }}></View>
           </Animated.View>
           <Button
             style={{
