@@ -93,7 +93,6 @@ export default function Chart({ navigation, route }) {
               }
             ),
           },
-
           info: {
             volume_pr: route.params.data.info.volume_pr * 0.453592,
             heaviest_set: {

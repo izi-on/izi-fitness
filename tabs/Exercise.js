@@ -13,7 +13,7 @@ import { RectButton } from "react-native-gesture-handler";
 import { Swipeable } from "react-native-gesture-handler";
 import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
-import _, { max } from "lodash";
+import _ from "lodash";
 import { _getData, _storeData } from "../custom-functions/async-functions";
 import { Context } from "../context/Context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -202,11 +202,9 @@ export default function Exercise({ navigation, route }) {
             toInsert = false;
             newData = prevData;
             const itemToModifyIndex = newData.findIndex((item) => {
-              return item.sets.forEach((set) => {
-                if (set.id === returnData.id) {
-                  return true;
-                }
-              });
+              return item.sets.filter((set) => {
+                return set.id === returnData.id ;
+              }).length > 0;
             });
             const setToModifyIndex = newData[itemToModifyIndex].sets.findIndex(
               (set) => {
@@ -391,13 +389,14 @@ export default function Exercise({ navigation, route }) {
       console.log(data_volume);
 
       //HEAVIEST SET DATA
-      var heaviest_weight = 0,
-        heaviest_reps = 0;
+      var heaviest_weight = 0;
+      var heaviest_reps = 0;
       const data_heaviest = DATA.map((item) => {
         var heaviest = 0;
         item.sets.forEach((set) => {
           heaviest = Math.max(heaviest, set.weight);
-          if ((set.weight = heaviest_weight)) {
+          
+          if ((set.weight === heaviest_weight)) {
             if (set.reps > heaviest_reps) {
               heaviest_weight = set.weight;
               heaviest_reps = set.reps;
@@ -406,6 +405,7 @@ export default function Exercise({ navigation, route }) {
             heaviest_weight = set.weight;
             heaviest_reps = set.reps;
           }
+          
         });
         return heaviest;
       }).reverse();
