@@ -328,7 +328,7 @@ export default function Home({ navigation, route }) {
                 Click ADD to get started!
               </Text>
             )}
-            <View style={{ height: 80, width: 10 }}></View>
+            <View style={{ height: 78, width: 10 }}></View>
           </Animated.View>
           <Button
             style={{

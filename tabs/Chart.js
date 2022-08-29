@@ -21,10 +21,12 @@ export default function Chart({ navigation, route }) {
   const graphColor1 = "#858585";
   const graphColor2 = theme === "dark" ? "#525252" : "#bfbfbf";
 
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const opacityValue = useRef(new Animated.Value(0)).current;
+  const animatedValue1 = useRef(new Animated.Value(0)).current;
+  const animatedValue2 = useRef(new Animated.Value(0)).current;
+  const opacityValue1 = useRef(new Animated.Value(0)).current;
+  const opacityValue2 = useRef(new Animated.Value(0)).current;
 
-  const [dataProperUnit, setDataProperUnit] = useState(null)
+  const [dataProperUnit, setDataProperUnit] = useState(null);
 
   const styles = {
     ChartTitle: {
@@ -33,17 +35,37 @@ export default function Chart({ navigation, route }) {
       fontWeight: "bold",
       fontSize: 20,
     },
+    ChartSubInfo: {
+      color: theme === "dark" ? "#a6a6a6" : "#595959",
+      marginTop: 10,
+    },
   };
 
   useEffect(() => {
     console.log("trigger animation");
-    Animated.timing(animatedValue, {
+    //trigger animation for graph 1
+    Animated.timing(animatedValue1, {
       toValue: 1,
       duration: 1000,
       useNativeDriver: true,
       easing: Easing.out(Easing.exp),
     }).start();
-    Animated.timing(opacityValue, {
+    //trigger animation (opacity) for graph 1
+    Animated.timing(opacityValue1, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+    //trigger animation for graph 2
+    Animated.timing(animatedValue2, {
+      delay: 300,
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.exp),
+    }).start();
+    Animated.timing(opacityValue2, {
+      delay: 300,
       toValue: 1,
       duration: 1000,
       useNativeDriver: true,
@@ -51,21 +73,44 @@ export default function Chart({ navigation, route }) {
   }, []);
 
   useEffect(() => {
+    console.log("navigating back: ", route.params.data);
     const unsub = navigation.addListener("focus", () => {
-      if (unit==='metric') {
-        console.log('UNIT APPLIED IS METRIC')
+      if (unit === "metric") {
+        console.log("UNIT APPLIED IS METRIC");
         setDataProperUnit({
           labels: route.params.data.labels,
-          datasets: route.params.data.datasets.map(item => {
-            const newData = item.data.map(item => {return item*0.453592})
-            return {data: newData}
-          }),
-          metricTheme: 'metric'
-        })
+
+          datasets: {
+            //change unit for volume graph
+            data_volume: route.params.data.datasets.data_volume.map((item) => {
+              return item * 0.453592;
+            }),
+
+            //change unit for heaviest graph
+            data_heaviest: route.params.data.datasets.data_heaviest.map(
+              (item) => {
+                return item * 0.453592;
+              }
+            ),
+          },
+
+          info: {
+            volume_pr: route.params.data.info.volume_pr * 0.453592,
+            heaviest_set: {
+              ...route.params.data.info.heaviest_set,
+              weight: route.params.data.info.heaviest_set.weight * 0.453592,
+            },
+          },
+          metricTheme: "metric",
+        });
         //triggerRefresh(r => !r)
       } else {
-        console.log('UNIT APPLIED IS IMPERIAL')
-        setDataProperUnit(route.params.data)
+        console.log("UNIT APPLIED IS IMPERIAL");
+        setDataProperUnit({
+          labels: route.params.data.labels,
+          datasets: route.params.data.datasets,
+          info: route.params.data.info,
+        });
         //triggerRefresh(r => !r)
       }
     });
@@ -79,48 +124,120 @@ export default function Chart({ navigation, route }) {
       style={{ flex: 1 }}
     >
       <View style={{ alignItems: "center", flex: 1 }}>
-        { dataProperUnit && 
-          <Animated.View
-            style={{
-              opacity: opacityValue,
-              transform: [
-                {
-                  translateY: animatedValue.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [Dimensions.get("window").height, 0],
-                  }),
-                },
-              ],
-            }}
-          >
-            <Text style={styles.ChartTitle}>VOLUME CHART</Text>
-            {console.log(unit, dataProperUnit)}
-            <LineChart
-              data={dataProperUnit}
-              width={Dimensions.get("window").width * 0.9} // from react-native
-              height={220}
-              chartConfig={{
-                fillShadowGradientFromOpacity: 0.3,
-                fillShadowGradientFrom: "green",
-                fillShadowGradientToOpacity: 0,
-                backgroundColor: graphColorBackground,
-                backgroundGradientFrom: graphColor1,
-                backgroundGradientTo: graphColor2,
-                decimalPlaces: 0, // optional, defaults to 2dp
-                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-              }}
-              bezier
+        {dataProperUnit && (
+          <>
+            <Animated.View
               style={{
-                marginTop: 15,
-                marginVertical: 8,
-                borderRadius: 16,
+                opacity: opacityValue1,
+                transform: [
+                  {
+                    translateY: animatedValue1.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [Dimensions.get("window").height, 0],
+                    }),
+                  },
+                ],
               }}
-            />
-          </Animated.View>
-        }
+            >
+              <Text style={styles.ChartTitle}>VOLUME PER WORKOUT CHART</Text>
+              <Text style={styles.ChartSubInfo}>
+                Best volume:{" "}
+                <Text style={{ ...styles.ChartSubInfo, color: "green" }}>
+                  {Math.round(dataProperUnit.info.volume_pr)}
+                </Text>
+              </Text>
+              <LineChart
+                data={{
+                  labels: dataProperUnit.labels,
+                  datasets: [
+                    {
+                      data: dataProperUnit.datasets.data_volume,
+                    },
+                  ],
+                }}
+                width={Dimensions.get("window").width * 0.9} // from react-native
+                height={220}
+                chartConfig={{
+                  fillShadowGradientFromOpacity: 0.3,
+                  fillShadowGradientFrom: "green",
+                  fillShadowGradientToOpacity: 0,
+                  backgroundColor: graphColorBackground,
+                  backgroundGradientFrom: graphColor1,
+                  backgroundGradientTo: graphColor2,
+                  decimalPlaces: 0, // optional, defaults to 2dp
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
+                  },
+                }}
+                bezier
+                style={{
+                  marginTop: 15,
+                  marginVertical: 8,
+                  borderRadius: 16,
+                }}
+              />
+            </Animated.View>
+            <Animated.View
+              style={{
+                opacity: opacityValue2,
+                transform: [
+                  {
+                    translateY: animatedValue2.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [Dimensions.get("window").height, 0],
+                    }),
+                  },
+                ],
+              }}
+            >
+              <Text style={styles.ChartTitle}>
+                HEAVIEST SET PER WORKOUT CHART
+              </Text>
+              <Text style={styles.ChartSubInfo}>
+                Heaviest set:{" "}
+                <Text style={{ ...styles.ChartSubInfo, color: "orange" }}>
+                  Reps: {dataProperUnit.info.heaviest_set.reps}
+                </Text>
+                <Text> </Text>
+                <Text style={{ ...styles.ChartSubInfo, color: "red" }}>
+                  Weight: {dataProperUnit.info.heaviest_set.weight}
+                </Text>
+              </Text>
+              <LineChart
+                data={{
+                  labels: dataProperUnit.labels,
+                  datasets: [
+                    {
+                      data: dataProperUnit.datasets.data_heaviest,
+                    },
+                  ],
+                }}
+                width={Dimensions.get("window").width * 0.9} // from react-native
+                height={220}
+                chartConfig={{
+                  fillShadowGradientFromOpacity: 0.3,
+                  fillShadowGradientFrom: "blue",
+                  fillShadowGradientToOpacity: 0,
+                  backgroundColor: graphColorBackground,
+                  backgroundGradientFrom: graphColor1,
+                  backgroundGradientTo: graphColor2,
+                  decimalPlaces: 0, // optional, defaults to 2dp
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
+                  },
+                }}
+                bezier
+                style={{
+                  marginTop: 15,
+                  marginVertical: 8,
+                  borderRadius: 16,
+                }}
+              />
+            </Animated.View>
+          </>
+        )}
       </View>
     </LinearGradient>
   );

@@ -13,7 +13,7 @@ import { RectButton } from "react-native-gesture-handler";
 import { Swipeable } from "react-native-gesture-handler";
 import uuid from "react-native-uuid";
 import { Button, Card, Divider, List, Text } from "react-native-paper";
-import _ from "lodash";
+import _, { max } from "lodash";
 import { _getData, _storeData } from "../custom-functions/async-functions";
 import { Context } from "../context/Context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -175,14 +175,14 @@ export default function Exercise({ navigation, route }) {
             newData = prevData.map((item) => {
               if (returnData.date.toLowerCase() === item.date.toLowerCase()) {
                 toInsert = false;
-                item.sets.push({
+                item.sets.unshift({
                   reps: returnData.reps,
                   weight: returnData.weight,
                   id: returnData.id,
                   time: returnData.time,
                   timeRaw: returnData.timeRaw,
                 });
-
+                /*
                 item.sets.sort((a, b) => {
                   if (a.time > b.time) {
                     return -1;
@@ -192,6 +192,7 @@ export default function Exercise({ navigation, route }) {
                   }
                   return 0;
                 });
+                */
               }
 
               return item;
@@ -201,11 +202,11 @@ export default function Exercise({ navigation, route }) {
             toInsert = false;
             newData = prevData;
             const itemToModifyIndex = newData.findIndex((item) => {
-              return (
-                item.sets.filter((set) => {
-                  return set.id === returnData.id;
-                }).length > 0
-              );
+              return item.sets.forEach((set) => {
+                if (set.id === returnData.id) {
+                  return true;
+                }
+              });
             });
             const setToModifyIndex = newData[itemToModifyIndex].sets.findIndex(
               (set) => {
@@ -316,6 +317,7 @@ export default function Exercise({ navigation, route }) {
 
   //handle navigating to Graph component with proper data
   const handleAnalytics = () => {
+    console.log(DATA);
     /*
     data={{
       labels: ["January", "February", "March", "April", "May", "June"],
@@ -333,67 +335,99 @@ export default function Exercise({ navigation, route }) {
       ],
     }}
     */
-
-    //DATES
-    var labels;
-    if (DATA.length < 5) {
-      labels = DATA.map((item) => {
-        console.log(new Date(item.date).toString());
-        const dateString = new Date(item.date)
+    if (DATA) {
+      //DATES
+      var labels;
+      if (DATA.length < 5) {
+        labels = DATA.map((item) => {
+          console.log(new Date(item.date).toString());
+          const dateString = new Date(item.date)
+            .toString()
+            .split(" ")
+            .slice(1, 3)
+            .join(" ");
+          return dateString;
+        }).reverse();
+      } else {
+        const startDate = new Date(DATA[0].date)
           .toString()
           .split(" ")
           .slice(1, 3)
           .join(" ");
-        return dateString;
+        const endDate = new Date(DATA.at(-1).date)
+          .toString()
+          .split(" ")
+          .slice(1, 3)
+          .join(" ");
+        const middleDateQ1 = new Date(DATA.at((DATA.length * 1) / 3).date)
+          .toString()
+          .split(" ")
+          .slice(1, 3)
+          .join(" ");
+        const middleDateQ3 = new Date(DATA.at((DATA.length * 2) / 3).date)
+          .toString()
+          .split(" ")
+          .slice(1, 3)
+          .join(" ");
+        labels = Array(DATA.length).fill("");
+        labels[0] = startDate;
+        labels[Math.floor(DATA.length / 3)] = middleDateQ1;
+        labels[Math.floor((DATA.length * 2) / 3)] = middleDateQ3;
+        labels[DATA.length - 1] = endDate;
+        labels.reverse();
+      }
+
+      //VOLUME DATA
+      var volumePr = 0;
+      const data_volume = DATA.map((item) => {
+        var volume = 0;
+        item.sets.forEach((set) => {
+          volume += set.reps * set.weight;
+        });
+        volumePr = Math.max(volumePr, volume);
+        return volume;
       }).reverse();
-    } else {
-      const startDate = new Date(DATA[0].date)
-        .toString()
-        .split(" ")
-        .slice(1, 3)
-        .join(" ");
-      const endDate = new Date(DATA.at(-1).date)
-        .toString()
-        .split(" ")
-        .slice(1, 3)
-        .join(" ");
-      const middleDate = new Date(DATA.at(DATA.length / 2).date)
-        .toString()
-        .split(" ")
-        .slice(1, 3)
-        .join(" ");
-      labels = Array(DATA.length).fill("");
-      labels[0] = startDate;
-      labels[Math.floor(DATA.length / 2)] = middleDate;
-      labels[DATA.length - 1] = endDate;
-      labels.reverse();
-    }
 
-    //VOLUME DATA
-    const data_volume = DATA.map((item) => {
-      var volume = 0;
-      item.sets.forEach((set) => {
-        volume += set.reps * set.weight;
-      });
-      return volume;
-    }).reverse();
+      console.log(data_volume);
 
-    //NAVIGATE TO CHART COMPONENT AND PASS DATA
-    navigation.navigate("Chart", {
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            data: data_volume,
+      //HEAVIEST SET DATA
+      var heaviest_weight = 0,
+        heaviest_reps = 0;
+      const data_heaviest = DATA.map((item) => {
+        var heaviest = 0;
+        item.sets.forEach((set) => {
+          heaviest = Math.max(heaviest, set.weight);
+          if ((set.weight = heaviest_weight)) {
+            if (set.reps > heaviest_reps) {
+              heaviest_weight = set.weight;
+              heaviest_reps = set.reps;
+            }
+          } else if (set.weight > heaviest_weight) {
+            heaviest_weight = set.weight;
+            heaviest_reps = set.reps;
+          }
+        });
+        return heaviest;
+      }).reverse();
+
+      console.log(data_heaviest);
+
+      //NAVIGATE TO CHART COMPONENT AND PASS DATA
+      navigation.navigate("Chart", {
+        data: {
+          labels: labels,
+          datasets: { data_volume: data_volume, data_heaviest: data_heaviest },
+          info: {
+            volume_pr: volumePr,
+            heaviest_set: { weight: heaviest_weight, reps: heaviest_reps },
           },
-        ],
-      },
-    });
+        },
+      });
+    }
   };
 
   //set last modified date
   useEffect(() => {
-    console.log("trigger modified date");
     if (modified) {
       console.log("TRIGGER LAST MODIFIED");
       //set last modified label
@@ -401,6 +435,10 @@ export default function Exercise({ navigation, route }) {
     }
     setModified(false);
   }, [modified]);
+
+  useEffect(() => {
+    console.log(DATA);
+  }, [DATA]);
 
   const bc = theme === "dark" ? ["#383838", "#565656"] : ["#BFBFBF", "#D6D6D6"]; //background color
   const tc = theme === "light" ? "#4F4F4F" : "#E0F0F0"; //text color
@@ -609,7 +647,7 @@ export default function Exercise({ navigation, route }) {
               extraData={[rerender, unit, theme]} //if set is modified, need to force this to rerender
             />
           )}
-          <View style={{ height: 45}}></View>
+          <View style={{ height: 45 }}></View>
         </Animated.View>
         {!DATA && (
           <Text

@@ -31,11 +31,17 @@ export default function App() {
   useEffect(() => {
     (async () => {
       initSettings = await _getData("settings");
+      console.log('Got settings')
       if (initSettings) {
         setUnit(initSettings.unit);
         setTheme(initSettings.theme);
         setPending(false);
+      } else {
+        setUnit('imperial')
+        setTheme('dark')
+        setPending(false)
       }
+
     })();
   }, []);
 
