@@ -73,10 +73,8 @@ export default function Chart({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    console.log("navigating back: ", route.params.data);
     const unsub = navigation.addListener("focus", () => {
       if (unit === "metric") {
-        console.log("UNIT APPLIED IS METRIC");
         setDataProperUnit({
           labels: route.params.data.labels,
 

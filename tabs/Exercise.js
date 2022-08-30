@@ -315,7 +315,6 @@ export default function Exercise({ navigation, route }) {
 
   //handle navigating to Graph component with proper data
   const handleAnalytics = () => {
-    console.log(DATA);
     /*
     data={{
       labels: ["January", "February", "March", "April", "May", "June"],
@@ -338,7 +337,6 @@ export default function Exercise({ navigation, route }) {
       var labels;
       if (DATA.length < 5) {
         labels = DATA.map((item) => {
-          console.log(new Date(item.date).toString());
           const dateString = new Date(item.date)
             .toString()
             .split(" ")
@@ -386,8 +384,6 @@ export default function Exercise({ navigation, route }) {
         return volume;
       }).reverse();
 
-      console.log(data_volume);
-
       //HEAVIEST SET DATA
       var heaviest_weight = 0;
       var heaviest_reps = 0;
@@ -396,21 +392,24 @@ export default function Exercise({ navigation, route }) {
         item.sets.forEach((set) => {
           heaviest = Math.max(heaviest, set.weight);
           
-          if ((set.weight === heaviest_weight)) {
-            if (set.reps > heaviest_reps) {
+          if (parseInt(set.weight) === heaviest_weight) {
+            if (parseInt(set.reps) > heaviest_reps) {
+              console.log('evaluating:', set.weight, '=', heaviest_weight, ": ", set.weight === heaviest_weight)
               heaviest_weight = set.weight;
               heaviest_reps = set.reps;
+              console.log('recording new heaviest set:', heaviest_weight, heaviest_reps)
             }
-          } else if (set.weight > heaviest_weight) {
+          } else if (parseInt(set.weight) > heaviest_weight) {
+            console.log(typeof(set.weight))
+            console.log('evaluating:', set.weight, '>', heaviest_weight, ": ", set.weight > heaviest_weight)
             heaviest_weight = set.weight;
             heaviest_reps = set.reps;
+            console.log('recording new heaviest set:', heaviest_weight, heaviest_reps)
           }
           
         });
         return heaviest;
       }).reverse();
-
-      console.log(data_heaviest);
 
       //NAVIGATE TO CHART COMPONENT AND PASS DATA
       navigation.navigate("Chart", {
