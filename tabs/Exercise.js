@@ -390,20 +390,21 @@ export default function Exercise({ navigation, route }) {
       const data_heaviest = DATA.map((item) => {
         var heaviest = 0;
         item.sets.forEach((set) => {
-          heaviest = Math.max(heaviest, set.weight);
-          
-          if (parseInt(set.weight) === heaviest_weight) {
-            if (parseInt(set.reps) > heaviest_reps) {
-              console.log('evaluating:', set.weight, '=', heaviest_weight, ": ", set.weight === heaviest_weight)
-              heaviest_weight = set.weight;
-              heaviest_reps = set.reps;
+          const setWeight = parseInt(set.weight)
+          const setReps = parseInt(set.reps)
+          heaviest = Math.max(heaviest, setWeight);
+          console.log('evaluating:', setWeight, '=', heaviest_weight, ": ", setWeight === heaviest_weight)
+          if (setWeight === heaviest_weight) {
+            console.log('evaluating reps:', setReps, '>', heaviest_reps, ": ", setReps === heaviest_reps)
+            if (setReps > heaviest_reps) {
+              heaviest_weight = setWeight;
+              heaviest_reps = setReps;
               console.log('recording new heaviest set:', heaviest_weight, heaviest_reps)
             }
-          } else if (parseInt(set.weight) > heaviest_weight) {
-            console.log(typeof(set.weight))
+          } else if (setWeight > heaviest_weight) {
             console.log('evaluating:', set.weight, '>', heaviest_weight, ": ", set.weight > heaviest_weight)
-            heaviest_weight = set.weight;
-            heaviest_reps = set.reps;
+            heaviest_weight = setWeight;
+            heaviest_reps = setReps;
             console.log('recording new heaviest set:', heaviest_weight, heaviest_reps)
           }
           
