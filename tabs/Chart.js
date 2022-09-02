@@ -10,8 +10,8 @@ import {
 import { Dimensions } from "react-native";
 import { Context } from "../context/Context";
 import { useContext } from "react";
+import LinearGradient from "react-native-linear-gradient";
 import { Animated } from "react-native";
-import { LinearGradient } from "react-native-svg";
 
 export default function Chart({ navigation, route }) {
   const { theme, unit } = useContext(Context);

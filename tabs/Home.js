@@ -22,7 +22,7 @@ import { Button, TextInput, Card, List } from "react-native-paper";
 import { _getData } from "../custom-functions/async-functions";
 import { Context } from "../context/Context";
 import { invertColor } from "../custom-functions/color-invert";
-import { LinearGradient } from "react-native-svg";
+import LinearGradient from "react-native-linear-gradient";
 
 export default function Home({ navigation, route }) {
   const [textS, setTextS] = useState("");

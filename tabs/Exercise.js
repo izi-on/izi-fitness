@@ -16,7 +16,8 @@ import { Button, Card, Divider, List, Text } from "react-native-paper";
 import _ from "lodash";
 import { _getData, _storeData } from "../custom-functions/async-functions";
 import { Context } from "../context/Context";
-import { LinearGradient } from "react-native-svg";
+import LinearGradient from "react-native-linear-gradient";
+
 
 export default function Exercise({ navigation, route }) {
   const name = route.params.name;
